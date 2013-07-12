@@ -26,49 +26,6 @@ class ActiveXml
 
 end
 
-class Element < ActiveXml
-
-  class Definition < ActiveXml
-    def max
-      node.xpath('./max').first.try(:[],:value)
-    end
-
-    def min
-      node.xpath('./min').first.try(:[],:value)
-    end
-
-    def type
-      type = node.xpath('./type/code').first
-      if type
-        type[:value]
-      end
-    end
-
-    def attribute?
-     ! type.nil? && type !~ /^Resource\(/
-    end
-
-    def entity?
-      type.nil?
-    end
-
-    def reference?
-     ! type.nil? && type =~ /^Resource\(/
-    end
-
-    def attributes
-    end
-  end
-
-  def path
-    node.xpath('./path').first[:value].split('.')
-  end
-
-  def definition
-    @definition = Definition.new(node.xpath('./definition').first)
-  end
-end
-
 class Structure < ActiveXml
   def name
     node.xpath('./type').first[:value]
