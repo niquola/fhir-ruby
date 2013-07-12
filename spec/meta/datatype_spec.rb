@@ -1,27 +1,23 @@
 require 'spec_helper'
 
-describe Fhir::Meta::Schema do
-  let(:schema) do
-    Fhir::Meta::Schema
-  end
-
+describe Fhir::Meta::Datatype do
   before(:each) do
-    file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
-    Fhir::Meta::Schema.load(file_name)
+    file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
+    Fhir::Meta::Datatype.load(file_name)
   end
 
   it 'should detect simple types' do
-    schema.find('integer').should be_simple
-    schema.find('id').should be_simple
-    schema.find('Element').should be_simple
+    Fhir::Meta::Datatype.find('integer').should be_simple
+    Fhir::Meta::Datatype.find('id').should be_simple
+    Fhir::Meta::Datatype.find('Element').should be_simple
 
-    schema.find('Extension').should be_complex
-    schema.find('QuantityCompararator').should be_complex
-    schema.find('Address').should be_complex
+    Fhir::Meta::Datatype.find('Extension').should be_complex
+    Fhir::Meta::Datatype.find('QuantityCompararator').should be_complex
+    Fhir::Meta::Datatype.find('Address').should be_complex
   end
 
   it 'should parse attributes' do
-    schema.all.each do |datatype|
+    Fhir::Meta::Datatype.all.each do |datatype|
       puts datatype.name
       if datatype.complex?
         datatype.attributes.each do |attribute|

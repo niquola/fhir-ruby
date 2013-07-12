@@ -3,6 +3,35 @@ require 'nokogiri'
 module Fhir
   module Meta
     class Datatype
+      class << self
+        def load(path)
+          @document = Nokogiri::XML(open(path).readlines.join(""))
+          @document.remove_namespaces!
+        end
+
+        def all
+          types
+        end
+
+        def find(name)
+          types.select do |type|
+            type.name == name
+          end.first
+        end
+
+        private
+
+        def types
+          @types ||= parse_types
+        end
+
+        def parse_types
+          @document.xpath('//schema/complexType').map do |complex_type|
+            self.new(complex_type)
+          end
+        end
+      end
+
       SIMPLE_TYPES = %w[decimal integer boolean
         instant date base64Binary string uri
         dateTime id code oid uuid Element]
@@ -32,17 +61,13 @@ module Fhir
 
       private
 
-      def schema
-        Fhir::Meta::Schema
-      end
-
       def parse_attributes
         attributes = []
         @node.xpath('./complexContent/extension/sequence/element').each do |attribute|
           attributes << {
             name: attribute[:name] || attribute[:ref],
             type_name: attribute[:type] || attribute[:ref],
-            type: schema.find(attribute[:type]),
+            type: self.class.find(attribute[:type]),
             min: attribute[:minOccurs],
             max: attribute[:maxOccurs]
           }
