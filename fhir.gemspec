@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fhir/ruby/version'
+require 'fhir/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "fhir-ruby"
-  spec.version       = Fhir::Ruby::VERSION
+  spec.version       = Fhir::VERSION
   spec.authors       = ["nicola"]
   spec.email         = ["niquola@gmail.com"]
   spec.description   = %q{TODO: Write a gem description}

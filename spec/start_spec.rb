@@ -100,14 +100,6 @@ s.elements.each do |el|
   end
 end
 
-address: Address.attributes
-Entity.attributes [ Attribute[type: Address] ]
-
-create_table '<%= entity.table_name %>' do |t|
-  <% entity.attributes.each do |attr| %>
-    t.<%= %> 
-
-
 puts <<-RUBY
   create_table #{s.root_entity} do |t|
 #{fields}
