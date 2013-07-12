@@ -3,7 +3,26 @@ require 'nokogiri'
 module Fhir
   module Meta
     class Resource < Fhir::Meta::ActiveXml
+      module Cardinality
+        def min
+          element.definition.min
+        end
+
+        def max
+          element.definition.max
+        end
+
+        def multiple?
+          max == '*'
+        end
+
+        def cardinality
+          "#{min}-#{max}"
+        end
+      end
+
       class Attr
+        include Cardinality
         attr :element
         def initialize(element)
           @element = element
@@ -19,6 +38,7 @@ module Fhir
       end
 
       class ResourceRef
+        include Cardinality
         attr :element
         def initialize(element)
           @element = element
@@ -34,7 +54,9 @@ module Fhir
       end
 
       class Association
+        include Cardinality
         attr :element
+
         def initialize(element)
           @element = element
         end

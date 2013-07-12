@@ -15,11 +15,11 @@ module Fhir
 
       class Definition < Fhir::Meta::ActiveXml
         def max
-          node.xpath('./max').first.try(:[],:value)
+          (node.xpath('./max').first || {})[:value]
         end
 
         def min
-          node.xpath('./min').first.try(:[],:value)
+          (node.xpath('./min').first || {})[:value]
         end
 
         def type
