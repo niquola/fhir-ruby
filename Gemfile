@@ -4,4 +4,5 @@ source 'https://rubygems.org'
 gemspec
 gem 'rspec'
 gem 'nokogiri'
-gem 'feedzirra'
+# gem 'feedzirra'
+gem 'active_support'
