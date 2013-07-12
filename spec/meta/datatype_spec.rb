@@ -21,8 +21,8 @@ describe Fhir::Meta::Datatype do
       puts datatype.name
       if datatype.complex?
         datatype.attributes.each do |attribute|
-          attribute[:type].should be_a Fhir::Meta::Datatype if attribute[:type]
-          puts "  #{attribute[:name]} <#{attribute[:type_name]}> #{attribute[:min]}..#{attribute[:max]}"
+          attribute.type.should be_a Fhir::Meta::Datatype if attribute.type
+          puts "  #{attribute.name} <#{attribute.type_name}> #{attribute.min}..#{attribute.max}"
         end
       elsif datatype.simple?
         datatype.attributes.should be_nil
