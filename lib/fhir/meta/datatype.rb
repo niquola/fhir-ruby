@@ -61,16 +61,22 @@ module Fhir
 
       private
 
+      class Attribute
+        attr_accessor :name, :type, :type_name, :min, :max
+
+        def initialize(attribute)
+          @name = attribute[:name] || attribute[:ref]
+          @type_name = attribute[:type] || attribute[:ref]
+          @type = Datatype.find(attribute[:type])
+          @min = attribute[:minOccurs]
+          @max = attribute[:maxOccurs]
+        end
+      end
+
       def parse_attributes
         attributes = []
         @node.xpath('./complexContent/extension/sequence/element').each do |attribute|
-          attributes << {
-            name: attribute[:name] || attribute[:ref],
-            type_name: attribute[:type] || attribute[:ref],
-            type: self.class.find(attribute[:type]),
-            min: attribute[:minOccurs],
-            max: attribute[:maxOccurs]
-          }
+          attributes << Attribute.new(attribute)
         end
         attributes
       end
