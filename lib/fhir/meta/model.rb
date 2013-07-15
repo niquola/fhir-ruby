@@ -20,7 +20,11 @@ module Fhir
       end
 
       def full_name
-        path.map(&:camelize).join('')
+        @name ||= path.map(&:camelize).join
+      end
+
+      def associations
+        @associations ||= []
       end
     end
   end

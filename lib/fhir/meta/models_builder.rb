@@ -12,10 +12,11 @@ module Fhir
         # Resource.all.map do |resource|
         [Resource.find("MedicationStatement")].map do |resource|
           resource.elements.map do |el|
-            next if %[extension text contained].include?(el.path.last)
+            next if is_hiden?(el)
             if is_model?(el)
               model = Model.new(el.path)
               model.attributes = collect_attributes_from_elements(resource, el)
+              model.associations.concat collect_associations_from_elements(resource, el)
               model
             elsif is_complex_type?(el.definition.type)
               model =  []
@@ -24,15 +25,6 @@ module Fhir
             model
           end
         end.flatten.compact
-      end
-
-      def collect_attributes_from_datatype(type)
-        Datatype.find(type).
-          attributes.select do |attr|
-          (attr.type.nil? || attr.type.simple?) && attr.max == '1'
-        end.map do |attr|
-          Attribute.new(attr.name, attr.type_name)
-        end
       end
 
       def collect_attributes_from_elements(resource, root_el)
@@ -46,6 +38,30 @@ module Fhir
           end
         end.compact
       end
+
+      def collect_associations_from_elements(resource, root_el)
+        resource.elements.map do |el|
+          next unless belongs_to?(root_el.path, el.path)
+          next if resource_ref?(el)
+          next if is_hiden?(el)
+          type =  Datatype.find(el.definition.type)
+          if type.nil? || type.complex?
+            Association.new(el.path.last.underscore,
+                            el.path.map(&:camelize).join,
+                            multiple: el.definition.max == '*', internal: true)
+          end
+        end.flatten.compact
+      end
+
+      def collect_attributes_from_datatype(type)
+        Datatype.find(type).
+          attributes.select do |attr|
+          (attr.type.nil? || attr.type.simple?) && attr.max == '1'
+        end.map do |attr|
+          Attribute.new(attr.name, attr.type_name)
+        end
+      end
+
 
       def collect_models_from_complex_type(acc, path, parent_type)
         acc << Model.new(path).tap do |m|
@@ -62,6 +78,10 @@ module Fhir
       end
 
       private
+
+      def is_hiden?(el)
+        %[extension text contained].include?(el.path.last)
+      end
 
       def is_model?(el)
         el.definition.type.nil? || el.definition.type == 'Resource'

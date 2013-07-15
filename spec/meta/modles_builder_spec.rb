@@ -30,65 +30,35 @@ describe "Fhir::Meta::ModelsBuilder" do
   #     m.full_name == "MedicationStatementIdentifier"
   #   end
   #   identifier.attributes.size.should == 3
+
+  #   coding = builder.build.find do |m|
+  #     m.full_name == "MedicationStatementDosageSiteCoding"
+  #   end
+  #   coding.should_not be_nil
   # end
 
   example do
-    builder.build.each do |m|
-      puts '-'*20
-      puts m.full_name
-      m.attributes.each do |a|
-        puts "* #{a.name} #{a.type}"
-      end
+    models = builder.build
+    medication_statment = models.find do |m|
+      m.full_name == "MedicationStatement"
     end
+
+    medication_statment.associations.each do |assoc|
+      p assoc
+    end
+
+    # dosage = medication_statment.has_one_associations.find do |assoc|
+    #   assoc.name == "dosage"
+    # end
+    # dosage.model = "MedicationStatementDosage"
   end
 
   # example do
-  #   Fhir::Meta::Resource.all.should_not be_empty
-
-  #   resources = Fhir::Meta::Resource.all
-  #   resources = [Fhir::Meta::Resource.find('MedicationStatement')]
-
-  #   resources.each do |res|
-  #     res.models.each do |model|
-  #       p model.full_name
-  #       model.attributes.each do |attr|
-  #         puts "* #{attr.name}"
-  #       end
-  #     end
-  #   end
-  # end
-
-  # example do
-  #   next
-  #   Fhir::Meta::Resource.all.should_not be_empty
-
-  #   resources = [Fhir::Meta::Resource.find('MedicationStatement'), Fhir::Meta::Resource.find('Condition')]
-  #   resources = Fhir::Meta::Resource.all
-
-  #   resources.each do |res|
-  #     res.models.each do |model|
-  #       puts
-  #       puts model.full_name
-  #       puts " attributes:"
-  #       model.attributes.each do |attr|
-  #         puts "   * #{attr.name} #{attr.cardinality}: #{attr.type}"
-  #       end
-
-  #       unless model.resource_refs.empty?
-  #         puts " resources:"
-  #         model.resource_refs.each do |attr|
-  #           puts "   * #{attr.name} #{attr.cardinality} #{attr.type}"
-  #         end
-  #       end
-
-  #       unless model.associations.empty?
-  #         puts " associations:"
-  #         model.associations.each do |attr|
-  #           puts "   * #{attr.name} #{attr.cardinality}"
-  #         end
-  #       end
-
-  #       puts '-' * 20
+  #   builder.build.each do |m|
+  #     puts '-'*20
+  #     puts m.full_name
+  #     m.attributes.each do |a|
+  #       puts "* #{a.name} #{a.type}"
   #     end
   #   end
   # end

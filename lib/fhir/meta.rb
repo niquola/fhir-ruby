@@ -5,6 +5,7 @@ module Fhir
     autoload :Datatype, 'fhir/meta/datatype'
     autoload :Model, 'fhir/meta/model'
     autoload :Attribute, 'fhir/meta/attribute'
+    autoload :Association, 'fhir/meta/association'
     autoload :ModelsBuilder, 'fhir/meta/models_builder'
   end
 end
