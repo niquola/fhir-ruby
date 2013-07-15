@@ -19,6 +19,11 @@ module Fhir
           end.first
         end
 
+        def enum_values(type_name)
+          enum_type = @document.xpath("//schema/simpleType[@name='#{type_name}']")
+          enum_type.xpath('./restriction/enumeration').map { |node| node[:value] }
+        end
+
         private
 
         def types
@@ -46,7 +51,7 @@ module Fhir
 
       def simple?
         return @simple unless @simple.nil?
-        @simple = SIMPLE_TYPES.include?(name)
+        @simple = SIMPLE_TYPES.include?(name) || enum?
         @simple
       end
 
@@ -54,9 +59,23 @@ module Fhir
         ! simple?
       end
 
+      def enum?
+        return @enum unless @enum.nil?
+         @node.xpath('./complexContent/extension/attribute').tap do |nodes|
+           @enum = (nodes.size == 1 && nodes.first[:type] =~ /-list$/)
+         end
+        @enum
+      end
+
       def attributes
         return nil if simple?
         @attributes ||= parse_attributes
+      end
+
+      def enum_values
+        return nil unless enum?
+        simple_type = @node.xpath('./complexContent/extension/attribute').first[:type]
+        self.class.enum_values(simple_type)
       end
 
       private
