@@ -6,6 +6,7 @@ module Fhir
     autoload :Model, 'fhir/meta/model'
     autoload :Attribute, 'fhir/meta/attribute'
     autoload :Association, 'fhir/meta/association'
+    autoload :ResourceRef, 'fhir/meta/resource_ref'
     autoload :ModelsBuilder, 'fhir/meta/models_builder'
   end
 end

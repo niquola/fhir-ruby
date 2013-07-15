@@ -8,6 +8,7 @@ module Fhir
       end
 
       attr :path
+      attr_accessor :parent
 
       def initialize(path)
         @path = path
@@ -25,6 +26,10 @@ module Fhir
 
       def associations
         @associations ||= []
+      end
+
+      def resource_refs
+        @resource_refs ||= []
       end
     end
   end
