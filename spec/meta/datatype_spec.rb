@@ -31,9 +31,16 @@ describe Fhir::Meta::Datatype do
     end
   end
 
+  it 'should detect and parse enum' do
+    Fhir::Meta::Datatype.find('Address').should_not be_enum
+    datatype = Fhir::Meta::Datatype.find('ObservationStatus')
+    datatype.should be_enum
+    datatype.enum_values.should =~ %w[registered interim final amended cancelled withdrawn]
+  end
+
   it 'should do something' do
     pending
-    file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
+    file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
     document = Nokogiri::XML(File.open(file_name).readlines.join)
     document.remove_namespaces!
 
