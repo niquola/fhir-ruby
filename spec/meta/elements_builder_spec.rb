@@ -79,9 +79,19 @@ describe "Fhir::Meta::ModelsBuilder" do
     .filter_technical_elements
     .filter_descendants(['MedicationStatement'])
     .modelize
-    .print do |path, elements|
-      "#{path.join('.')}: \n#{elements.map(&:attributes).map(&:inspect).join("\n")}"
-    end.all
+    .template do
+      <<-ERB
+class <%= el.first.map(&:camelize).join %>
+  <% monadic(el.last).filter_simple_types.each do |attr| -%>
+   attr_accessor <%= attr.path.last -%> # <%= attr.type -%> <%= attr.max %>
+  <% end -%>
+
+  <% el.last.reject{|e| e.attributes[:simple]}.each do |attr| -%>
+   association <%= attr.path.last %> # <%= attr.type %> <%= attr.max %>
+  <% end -%>
+end
+      ERB
+    end.print
   end
 
   it "template" do
@@ -92,12 +102,4 @@ describe "Fhir::Meta::ModelsBuilder" do
       ERB
     end.print
   end
-
-  # example do
-  #   puts @elements
-  #   .select{|e| e.path[0] == 'MedicationStatement'}
-  #   .sort_by(&:path)
-  #   .map(&:label)
-  #   .join("\n")
-  # end
 end

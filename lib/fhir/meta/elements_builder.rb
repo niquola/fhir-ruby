@@ -121,6 +121,12 @@ module Fhir
         elements.select(&block)
       end
 
+      def filter_simple_types(elements)
+        elements.select {|el|
+          el.attributes[:simple]
+        }
+      end
+
       def sort(elements, &block)
         elements.sort_by(&block)
       end
