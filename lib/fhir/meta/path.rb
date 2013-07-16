@@ -4,7 +4,7 @@ module Fhir
       include Comparable
 
       def initialize(array)
-        @array = array.freeze
+        @array = array.to_a.freeze
       end
 
       def inspect
@@ -20,7 +20,7 @@ module Fhir
       end
 
       def subpath?(subpath)
-        subpath.to_s.start_with?(self.to_s)
+        subpath.to_s.start_with?(self.to_s) && subpath.size > self.size
       end
 
       def child?(subpath)

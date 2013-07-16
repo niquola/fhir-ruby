@@ -23,7 +23,7 @@ module Fhir
       end
 
       def class_name
-        path.join('_').camelize
+        path.to_a.map(&:camelize).join
       end
 
       def initialize_copy(origin)

@@ -18,13 +18,17 @@ describe 'Polymorphic Generation' do
     .filter_descendants(['MedicationStatement'])
     .apply_rules(rules)
     .tableize
+    .print do |el|
+      p el.elements.send(:mod).methods
+      el.elements.filter_simple_types
+    end
 
 
     tables.template do
       <<-ERB
-create_table <%= el.path.join('_').underscore %> do |t|
+create_table <%= el.path.to_a.join('_').underscore %> do |t|
 <% el.elements.filter_simple_types.each do |element| -%>
-  t.string :<%= element.path.join('__').underscore %>
+  t.string :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 end
       ERB
@@ -34,8 +38,7 @@ end
       <<-ERB
 class <%= el.class_name %>
 <% el.elements.filter_simple_types.each do |element| -%>
-  # <%= element.attributes[:short] %>
-  attr_accessor :<%= element.path.join('__').underscore %>
+  attr_accessor :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 <% el.elements.reject_singular.each do |element| -%>
   has_many :<%= element.path.last.underscore.pluralize %>
@@ -43,7 +46,7 @@ class <%= el.class_name %>
 end
       ERB
     end
-    .file(File.dirname(__FILE__)+ '/models'){|el| el.path.join("_") + 'rb'}
+    .file(File.dirname(__FILE__)+ '/../tmp/models'){|el| el.path.to_a.join("_") + '.rb'}
     .print(&:last)
   end
 end

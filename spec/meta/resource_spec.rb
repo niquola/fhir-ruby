@@ -11,7 +11,7 @@ describe "Fhir::Meta::Resource" do
 
   example do
     resources = Fhir::Meta::Resource.all
-    resources.length.should == 48
+    resources.length.should == 49
   end
 
   example do
