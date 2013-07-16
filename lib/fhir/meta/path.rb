@@ -1,0 +1,72 @@
+module Fhir
+  module Meta
+    class Path
+      def initialize(array)
+        @array = array.freeze
+      end
+
+      def inspect
+        to_a.join('.')
+      end
+
+      def to_a
+        @array
+      end
+
+      def to_s
+        to_a.join('.')
+      end
+
+      def subpath?(subpath)
+        subpath.to_s.start_with?(self.to_s)
+      end
+
+      alias :include? :subpath?
+      alias :'>?' :subpath?
+
+      def self_or_subpath?(subpath)
+        subpath.to_s =~ /^#{self.to_s}/
+      end
+
+      def >(subpath)
+        subpath?(subpath)
+      end
+
+      def <(superpath)
+        superpath.subpath?(self)
+      end
+
+      def length
+        to_a.length
+      end
+
+      alias :size :length
+
+      def relative(path)
+        raise "#{path} not subpath of #{self}" unless path.subpath?(self)
+        self.class.new(to_a[path.length..-1])
+      end
+
+      def -(path)
+        relative(path)
+      end
+
+      def concat(other_path)
+        self.class.new(to_a + other_path.to_a)
+      end
+
+      def +(other_path)
+        concat(other_path)
+      end
+
+      def ==(other_path)
+        to_a == other_path.to_a
+      end
+      alias :eql? :==
+
+      def initialize_copy(origin)
+        @array = origin.to_a
+      end
+    end
+  end
+end
