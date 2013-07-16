@@ -62,7 +62,7 @@ module Fhir
       def enum?
         return @enum unless @enum.nil?
          @node.xpath('./complexContent/extension/attribute').tap do |nodes|
-           @enum = (nodes.size == 1 && nodes.first[:type] =~ /-list$/)
+           @enum = (nodes.size == 1 && !!(nodes.first[:type] =~ /-list$/))
          end
         @enum
       end

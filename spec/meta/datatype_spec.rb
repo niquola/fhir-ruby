@@ -34,6 +34,7 @@ describe Fhir::Meta::Datatype do
   it 'should detect and parse enum' do
     Fhir::Meta::Datatype.find('Address').should_not be_enum
     datatype = Fhir::Meta::Datatype.find('ObservationStatus')
+
     datatype.should be_enum
     datatype.enum_values.should =~ %w[registered interim final amended cancelled withdrawn]
   end
