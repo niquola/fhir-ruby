@@ -205,7 +205,7 @@ module Fhir
       # ROOT a -> *b -> 1c
       # ROOT a -> 1d -> 1e
       def tableize(elements)
-        elements.map do |element|
+        elements.map do |el|
           children = filter_alone_descendants(elements, el.path)
           unless children.empty?
             el.copy.tap {|e| e.attributes[:elements] = monadic(children) }

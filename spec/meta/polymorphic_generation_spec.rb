@@ -10,19 +10,20 @@ describe 'Polymorphic Generation' do
       %w[MedicationStatement dosage method coding] => {max: '1'},
       %w[MedicationStatement identifier] => {max: '1'}
     }
+
     builder.monadic
-    resource_elements
+    .resource_elements
     .expand_with_datatypes
     .filter_technical_elements
     .filter_descendants(['MedicationStatement'])
     .apply_rules(rules)
-    .modelize
+    .tableize
     .reject_singular
     .template do
       <<-ERB
 class <%= el.class_name %>
 <% el.elements.filter_simple_types.each do |element| -%>
-  attr_accessor :<%= element.path.last.underscore %>
+  attr_accessor :<%= element.path.join('__').underscore %>
 <% end -%>
 <% el.elements.reject_singular.each do |element| -%>
   has_many :<%= element.path.last.underscore.pluralize %>
