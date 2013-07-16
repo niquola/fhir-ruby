@@ -58,9 +58,9 @@ describe "Fhir::Meta::ModelsBuilder" do
       "#{el.first.join('.')}: #{el.last.map(&:attributes).inspect}"
     end.all
 
-    res[['Entity']].should_not be_nil
-    res[['Entity','ass']].should_not be_nil
-    res.length.should == 2
+      res[['Entity']].should_not be_nil
+      res[['Entity','ass']].should_not be_nil
+      res.length.should == 2
   end
 
   it "visualize" do
@@ -101,5 +101,18 @@ end
         item: <%= el %>
       ERB
     end.print
+  end
+
+  it "file" do
+    tmp_folder = File.join(File.dirname(__FILE__), 'tmp')
+    FileUtils.rm_rf(tmp_folder)
+
+    m.monadic([%w[one odin], %w[two dva]])
+    .file(tmp_folder) do |el|
+      "#{el}.txt"
+    end
+
+    File.exists?("#{tmp_folder}/one.txt").should be_true
+    File.open("#{tmp_folder}/one.txt").readlines.first.should == 'odin'
   end
 end

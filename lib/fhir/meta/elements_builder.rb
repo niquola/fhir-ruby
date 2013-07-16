@@ -112,7 +112,17 @@ module Fhir
         template_str = block.call
         template = ERB.new(template_str, nil, '%<>-')
         elements.map do |el|
-           template.result(binding)
+          [el, template.result(binding)]
+        end
+      end
+
+      def file(elements, folder_path, &block)
+        FileUtils.mkdir_p(folder_path)
+        elements.each do |pair|
+          el = pair.first
+          content = pair.last
+          file_name = block.call(el)
+          File.open(File.join(folder_path, file_name), 'w') {|f| f<< content }
         end
       end
 
