@@ -5,77 +5,38 @@ require "erb"
 module Fhir
   module Meta
     module ElementsBuilder
-      class Element
-        attr :attributes
-
-        def initialize(attributes)
-          @attributes = attributes
-        end
-
-        def method_missing(attr)
-          if @attributes.key?(attr.to_sym)
-            @attributes[attr.to_sym]
-          else
-            super
-          end
-        end
-
-        def label
-          "#{path.join('.')} (#{type}): #{min}-#{max}"
-        end
-
-        def copy
-          self.class.new(attributes.dup)
-        end
-
-        def class_name
-          path.join('_').camelize
-        end
-      end
-
-      class Monad
-        def initialize(list)
-          @list = list
-        end
-
-        def all
-          @list
-        end
-
-        def method_missing(method, *args, &block)
-          m = Fhir::Meta::ElementsBuilder
-          super unless m.respond_to?(method)
-          Monad.new(m.send(method, *([@list] + args), &block))
+      def ensure_path(path)
+        unless path.is_a?(Path)
+          Path.new(path)
+        else
+          path
         end
       end
 
       def monadic(list=[])
-        Monad.new(list)
+        SimpleMonad.new(list,[self])
       end
 
-      def element(attrs)
-        Element.new(attrs)
+      def element(path_array, attrs = {})
+        Element.new(Path.new(path_array), attrs)
       end
 
       def find_by_path(list, path)
+        path = ensure_path(path)
         list.select {|el| el.path == path }
       end
 
       def filter_descendants(elements, path)
+        path = ensure_path(path)
         elements.select do |el|
-          el.path.join('.') =~ /^#{path.join('.')}/
-        end
-      end
-
-      def reject_descendants(elements, path)
-        elements.reject do |el|
-          el.path.join('.') =~ /^#{path.join('.')}\./
+          el.path <= path
         end
       end
 
       def filter_children(elements, path)
+        path = ensure_path(path)
         elements.select do |el|
-          el.path.join('.') =~ /^#{path.join('.')}\.[^.]+$/
+          path.child?(el.path)
         end
       end
 
@@ -92,7 +53,7 @@ module Fhir
       def resource_elements(list = [])
         Resource.all.map do |resource|
           resource.elements.map do |el|
-            element(path: el.path,
+            element(el.path,
                     short: el.definition.short,
                     max: el.definition.max,
                     min: el.definition.min,
@@ -119,7 +80,7 @@ module Fhir
 
       def element_from_datatype_attrs(parent_el, attrs)
         attrs.map do |attr|
-          element(path: parent_el.path + [attr.name],
+          element(parent_el.path + [attr.name],
                   type: attr.type_name,
                   max: attr.max == 'unbounded' ? '*' : attr.max,
                   min: attr.min,
@@ -191,7 +152,7 @@ module Fhir
         elements.map do |el|
           children = filter_children(elements, el.path)
           unless children.empty?
-            el.copy.tap {|e| e.attributes[:elements] = monadic(children) }
+            el.clone.tap {|e| e.elements = monadic(children) }
           end
         end.compact
       end
@@ -200,7 +161,7 @@ module Fhir
         elements.map do |el|
           children = filter_alone_descendants(elements, el.path)
           unless children.empty?
-            el.copy.tap {|e| e.attributes[:elements] = monadic(children) }
+            el.clone.tap {|e| e.elements = monadic(children) }
           end
         end.compact
       end

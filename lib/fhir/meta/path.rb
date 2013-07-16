@@ -1,6 +1,8 @@
 module Fhir
   module Meta
     class Path
+      include Comparable
+
       def initialize(array)
         @array = array.freeze
       end
@@ -21,11 +23,22 @@ module Fhir
         subpath.to_s.start_with?(self.to_s)
       end
 
+      def child?(subpath)
+        subpath.to_s =~ /^#{to_s}\.[^.]+$/
+      end
+
       alias :include? :subpath?
-      alias :'>?' :subpath?
 
       def self_or_subpath?(subpath)
         subpath.to_s =~ /^#{self.to_s}/
+      end
+
+      def >=(subpath)
+        self_or_subpath?(subpath)
+      end
+
+      def <=(superpath)
+        superpath.self_or_subpath?(self)
       end
 
       def >(subpath)
@@ -38,6 +51,14 @@ module Fhir
 
       def length
         to_a.length
+      end
+
+      def last
+        to_a.last
+      end
+
+      def first
+        to_a.last
       end
 
       alias :size :length
@@ -62,11 +83,16 @@ module Fhir
       def ==(other_path)
         to_a == other_path.to_a
       end
-      alias :eql? :==
+
+      def <=>(other)
+        to_a <=> other.to_a
+      end
 
       def initialize_copy(origin)
         @array = origin.to_a
       end
+
+      alias :eql? :==
     end
   end
 end

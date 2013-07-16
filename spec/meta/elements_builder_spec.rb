@@ -19,27 +19,27 @@ describe "Fhir::Meta::ModelsBuilder" do
 
   it "filter_technical_elements" do
 
-    m.monadic([m.element(path:['one','text'])])
+    m.monadic([m.element(['one','text'])])
     .filter_technical_elements
     .all
     .should == []
 
-    m.monadic([m.element(path:['one','text'])])
+    m.monadic([m.element(['one','text'])])
     .filter_technical_elements
     .all
     .should == []
 
-    m.monadic([m.element(path:['one','extension'])])
+    m.monadic([m.element(['one','extension'])])
     .filter_technical_elements
     .all
     .should == []
 
-    m.monadic([m.element(path:['one','contained'])])
+    m.monadic([m.element(['one','contained'])])
     .filter_technical_elements
     .all
     .should == []
 
-    m.monadic([m.element(path:['one','two'])])
+    m.monadic([m.element(['one','two'])])
     .filter_technical_elements
     .all
     .should_not be_empty
@@ -47,11 +47,11 @@ describe "Fhir::Meta::ModelsBuilder" do
 
   it "modlize" do
     res = m.monadic([
-      m.element(path:['Entity']),
-      m.element(path:['Entity','prop']),
-      m.element(path:['Entity','prop2']),
-      m.element(path:['Entity','ass'], max: '*'),
-      m.element(path:['Entity','ass','prop3'])
+      m.element(['Entity']),
+      m.element(['Entity','prop']),
+      m.element(['Entity','prop2']),
+      m.element(['Entity','ass'], max: '*'),
+      m.element(['Entity','ass','prop3'])
     ]).modelize.all
 
     res.size.should == 2
@@ -61,9 +61,9 @@ describe "Fhir::Meta::ModelsBuilder" do
   end
   it 'should apply rulez' do
     m.monadic([
-      m.element(path:['Entity']),
-      m.element(path:['Entity','prop'], max: '1'),
-      m.element(path:['Entity','prop2'])
+      m.element(['Entity']),
+      m.element(['Entity','prop'], max: '1'),
+      m.element(['Entity','prop2'])
     ]).apply_rules(['Entity','prop'] => {max: '*'})
     .find_by_path(['Entity','prop'])
     .all.first.max.should == '*'
@@ -71,13 +71,13 @@ describe "Fhir::Meta::ModelsBuilder" do
 
   it 'should filter children' do
     res = m.monadic([
-      m.element(path:['Entity']),
-      m.element(path:['Entity','prop']),
-      m.element(path:['Entity','prop2']),
-      m.element(path:['Entity','ass1'], max: '*'),
-      m.element(path:['Entity','ass1','prop3']),
-      m.element(path:['Entity','ass2'], max: '1'),
-      m.element(path:['Entity','ass1','prop4'])
+      m.element(['Entity']),
+      m.element(['Entity','prop']),
+      m.element(['Entity','prop2']),
+      m.element(['Entity','ass1'], max: '*'),
+      m.element(['Entity','ass1','prop3']),
+      m.element(['Entity','ass2'], max: '1'),
+      m.element(['Entity','ass1','prop4'])
     ])
     .filter_children(['Entity']).all
     .map(&:path).map(&:last).should =~ %w[prop prop2 ass1 ass2]
@@ -86,13 +86,13 @@ describe "Fhir::Meta::ModelsBuilder" do
   it 'filter_alone_descendants' do
 
     res = m.monadic([
-      m.element(path:['Entity']),
-      m.element(path:['Entity','prop']),
-      m.element(path:['Entity','prop2']),
-      m.element(path:['Entity','ass1'], max: '*'),
-      m.element(path:['Entity','ass1','prop3']), #should be removed
-      m.element(path:['Entity','ass1','prop4']), #should be removed
-      m.element(path:['Entity','ass2'], max: '1'),
+      m.element(['Entity']),
+      m.element(['Entity','prop']),
+      m.element(['Entity','prop2']),
+      m.element(['Entity','ass1'], max: '*'),
+      m.element(['Entity','ass1','prop3']), #should be removed
+      m.element(['Entity','ass1','prop4']), #should be removed
+      m.element(['Entity','ass2'], max: '1'),
     ])
     .filter_alone_descendants(['Entity'])
     .all
@@ -127,15 +127,15 @@ describe "Fhir::Meta::ModelsBuilder" do
 
   it 'should tableize' do
     res = m.monadic([
-      m.element(path:['Entity']),
-      m.element(path:['Entity','prop']),
-      m.element(path:['Entity','prop2']),
+      m.element(['Entity']),
+      m.element(['Entity','prop']),
+      m.element(['Entity','prop2']),
 
-      m.element(path:['Entity','ass1'], max: '*'),
-      m.element(path:['Entity','ass1','prop3']),
+      m.element(['Entity','ass1'], max: '*'),
+      m.element(['Entity','ass1','prop3']),
 
-      m.element(path:['Entity','ass2'], max: '1'),
-      m.element(path:['Entity','ass2','prop4'])
+      m.element(['Entity','ass2'], max: '1'),
+      m.element(['Entity','ass2','prop4'])
     ]).tableize.all
 
     res.size.should == 3

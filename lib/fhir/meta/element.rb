@@ -3,7 +3,7 @@ module Fhir
     class Element
       attr :path
       attr :attributes
-      attr :elements
+      attr_accessor :elements
 
       def initialize(path, attributes)
         @path = path
