@@ -196,14 +196,6 @@ module Fhir
         end.compact
       end
 
-      #Entity
-      #Entity.one 1
-      #Entity.one.prop 1
-      #Entity.two 1
-      #Entity.two.tree 1
-      #Entity.two.tree.prop 1
-      # ROOT a -> *b -> 1c
-      # ROOT a -> 1d -> 1e
       def tableize(elements)
         elements.map do |el|
           children = filter_alone_descendants(elements, el.path)
@@ -213,11 +205,6 @@ module Fhir
         end.compact
       end
 
-      # ROOT a -> *b -> 1c => [a, b]
-      # ROOT a -> 1d -> 1e =  [a, d, e]
-      # 1 1 * 11
-      # 1 1 1 1
-      # 1 1 *
       def filter_alone_descendants(elements, path)
         children = filter_children(elements, path)
         children.map do |chld|

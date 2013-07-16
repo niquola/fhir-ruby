@@ -138,6 +138,6 @@ describe "Fhir::Meta::ModelsBuilder" do
       m.element(path:['Entity','ass2','prop4'])
     ]).tableize.all
 
-    res.all.size.should == 2
+    res.size.should == 3
   end
 end
