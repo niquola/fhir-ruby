@@ -32,7 +32,8 @@ create_table <%= el.path.to_a.join('_').underscore %> do |t|
 <% end -%>
 end
       ERB
-    end.print(&:last)
+    end
+    .print(&:code)
 
     tables.template do
       <<-ERB
@@ -47,6 +48,6 @@ end
       ERB
     end
     .file(File.dirname(__FILE__)+ '/../tmp/models'){|el| el.path.to_a.join("_") + '.rb'}
-    .print(&:last)
+    .print(&:code)
   end
 end

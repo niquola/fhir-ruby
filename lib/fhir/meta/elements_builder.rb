@@ -21,16 +21,25 @@ module Fhir
 	list.select {|el| el.path == to_path(path) }
       end
 
-      def filter_descendants(elements, path)
-	elements.select do |el|
-	  el.path < to_path(path)
+      #GENERIC MONADS
+      def filter(elements, &block)
+	elements.select(&block)
+      end
+
+      def self.filter(name, &block)
+	define_method "filter_#{name}" do |elements, *args|
+	  elements.select do |el|
+	    block.call(el, *args)
+	  end
 	end
       end
 
-      def filter_children(elements, path)
-	elements.select do |el|
-	  to_path(path).child?(el.path)
-	end
+      filter :descendants do |el, path|
+	el.path < to_path(path)
+      end
+
+      filter :children do |el, path|
+	to_path(path).child?(el.path)
       end
 
       def reject_non_root(elements)
@@ -95,25 +104,20 @@ module Fhir
       def template(elements, &block)
 	template_str = block.call
 	template = ERB.new(template_str, nil, '%<>-')
-	elements.map do |el|
-	  [el, template.result(binding)]
+	elements.each do |el|
+	  el.attributes[:code] = template.result(binding)
 	end
       end
 
       def file(elements, folder_path, &block)
 	FileUtils.mkdir_p(folder_path)
-	elements.each do |pair|
-	  el = pair.first
-	  content = pair.last
+	elements.each do |el|
+	  content = el.code
 	  file_name = block.call(el)
 	  File.open(File.join(folder_path, file_name), 'w') {|f| f<< content }
 	end
       end
 
-      #GENERIC MONADS
-      def filter(elements, &block)
-	elements.select(&block)
-      end
 
       def filter_simple_types(elements)
 	elements.select {|el|

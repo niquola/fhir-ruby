@@ -139,21 +139,27 @@ describe "Fhir::Meta::ModelsBuilder" do
   end
 
   it "template" do
-    m.monadic([1,2,3])
-    .template do
+    m.monadic([
+      m.element(%w[a b])
+    ]).template do
       <<-ERB
-	item: <%= el %>
+item: <%= el.path -%>
       ERB
-    end.print
+    end
+    .all
+    .first.code.should == "item: a.b"
   end
 
   it "file" do
     tmp_folder = File.join(File.dirname(__FILE__), 'tmp')
     FileUtils.rm_rf(tmp_folder)
 
-    m.monadic([%w[one odin], %w[two dva]])
+    m.monadic([
+      m.element(%w[one], code: 'odin'),
+      m.element(%w[two], code: 'dva')
+    ])
     .file(tmp_folder) do |el|
-      "#{el}.txt"
+      "#{el.path}.txt"
     end
 
     File.exists?("#{tmp_folder}/one.txt").should be_true
