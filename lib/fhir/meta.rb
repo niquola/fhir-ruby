@@ -8,5 +8,6 @@ module Fhir
     autoload :Association, 'fhir/meta/association'
     autoload :ResourceRef, 'fhir/meta/resource_ref'
     autoload :ModelsBuilder, 'fhir/meta/models_builder'
+    autoload :ElementsBuilder, 'fhir/meta/elements_builder'
   end
 end
