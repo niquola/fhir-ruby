@@ -10,9 +10,9 @@ describe Fhir::Meta::Datatype do
     Fhir::Meta::Datatype.find('integer').should be_simple
     Fhir::Meta::Datatype.find('id').should be_simple
     Fhir::Meta::Datatype.find('Element').should be_simple
+    Fhir::Meta::Datatype.find('QuantityCompararator').should be_simple
 
     Fhir::Meta::Datatype.find('Extension').should be_complex
-    Fhir::Meta::Datatype.find('QuantityCompararator').should be_complex
     Fhir::Meta::Datatype.find('Address').should be_complex
   end
 
