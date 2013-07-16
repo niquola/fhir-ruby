@@ -23,6 +23,14 @@ module Fhir
         def label
           "#{path.join('.')} (#{type}): #{min}-#{max}"
         end
+
+        def copy
+          self.class.new(attributes.dup)
+        end
+
+        def class_name
+          path.join('_').camelize
+        end
       end
 
       class Monad
@@ -54,9 +62,31 @@ module Fhir
       end
 
       def filter_descendants(elements, path)
-        elements.select {|el|
-          (el.path & ['MedicationStatement']) == ['MedicationStatement']
-        }
+        elements.select do |el|
+          el.path.join('.') =~ /^#{path.join('.')}/
+        end
+      end
+
+      def reject_descendants(elements, path)
+        elements.reject do |el|
+          el.path.join('.') =~ /^#{path.join('.')}\./
+        end
+      end
+
+      def filter_children(elements, path)
+        elements.select do |el|
+          el.path.join('.') =~ /^#{path.join('.')}\.[^.]+$/
+        end
+      end
+
+      def reject_non_root(elements)
+        elements.reject { |element| element.path.size > 1 }
+      end
+
+      def reject_singular(elements)
+        elements.reject do |element|
+          element.path.size > 1 && element.max == '1'
+        end
       end
 
       def resource_elements(list = [])
@@ -150,28 +180,60 @@ module Fhir
           if block_given?
             puts block.call(el)
           else
-            puts el
+            p el
+            puts
           end
         end
         elements
       end
 
       def modelize(elements)
-        models = {}
-        index_elements(elements).each do |k, v|
-          models[k] = v unless v.empty?
-        end
-        models
+        elements.map do |el|
+          children = filter_children(elements, el.path)
+          unless children.empty?
+            el.copy.tap {|e| e.attributes[:elements] = monadic(children) }
+          end
+        end.compact
       end
 
-      def index_elements(elements)
-        index = {}
-        elements.each do |el|
-          index[el.path]  = []
-          parent_path = el.path[0..-2]
-          index[parent_path]<< el if index.key?(parent_path)
+      #Entity
+      #Entity.one 1
+      #Entity.one.prop 1
+      #Entity.two 1
+      #Entity.two.tree 1
+      #Entity.two.tree.prop 1
+      # ROOT a -> *b -> 1c
+      # ROOT a -> 1d -> 1e
+      def tableize(elements)
+        elements.map do |element|
+          children = filter_alone_descendants(elements, el.path)
+          unless children.empty?
+            el.copy.tap {|e| e.attributes[:elements] = monadic(children) }
+          end
+        end.compact
+      end
+
+      # ROOT a -> *b -> 1c => [a, b]
+      # ROOT a -> 1d -> 1e =  [a, d, e]
+      # 1 1 * 11
+      # 1 1 1 1
+      # 1 1 *
+      def filter_alone_descendants(elements, path)
+        children = filter_children(elements, path)
+        children.map do |chld|
+          next if chld.attributes[:max] && chld.max == '*'
+          [chld] + filter_children(elements, chld.path)
+        end.flatten.compact
+      end
+
+      def apply_rules(elements, rules)
+        elements.each do |element|
+          rules.each do |path, rule|
+            if element.path == path
+              element.attributes.merge!(rule)
+            end
+          end
         end
-        index
       end
 
       extend self

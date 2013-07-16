@@ -11,3 +11,7 @@ unless File.exists?(FHIR_FILE)
     cf<< f.readlines.join("\n")
   end
 end
+
+Fhir::Meta::Resource.load(FHIR_FILE)
+file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
+Fhir::Meta::Datatype.load(file_name)
