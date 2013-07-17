@@ -1,19 +1,15 @@
 require 'spec_helper'
 
-Fhir::Meta::Resource.load(FHIR_FILE)
-file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
-Fhir::Meta::Datatype.load(file_name)
-
-describe "Fhir::Meta::ModelsBuilder" do
-  let(:m) { Fhir::Meta::ElementsBuilder }
+describe "Fhir::ModelsBuilder" do
+  let(:m) { Fhir::ElementsBuilder }
 
   it "monadic" do
     res = m.monadic([1,2,3])
-    res.should be_a(Fhir::Meta::SimpleMonad)
+    res.should be_a(Fhir::SimpleMonad)
   end
 
   it "element" do
-    m.element(%w[a b c], opt1: 'val1').should be_a(Fhir::Meta::Element)
+    m.element(%w[a b c], opt1: 'val1').should be_a(Fhir::Element)
   end
 
   let(:elements) {

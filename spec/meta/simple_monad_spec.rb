@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Fhir::Meta::SimpleMonad do
+describe Fhir::SimpleMonad do
   let(:m) { described_class }
 
   module ListOperations

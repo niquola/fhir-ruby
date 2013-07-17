@@ -12,6 +12,6 @@ unless File.exists?(FHIR_FILE)
   end
 end
 
-Fhir::Meta::Resource.load(FHIR_FILE)
+Fhir::Resource.load(FHIR_FILE)
 file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
-Fhir::Meta::Datatype.load(file_name)
+Fhir::Datatype.load(file_name)

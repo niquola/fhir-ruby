@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'Polymorphic Generation' do
-  let(:builder) { Fhir::Meta::ElementsBuilder }
+  let(:builder) { Fhir::ElementsBuilder }
 
   it 'should generate polymorphic models' do
     rules = {

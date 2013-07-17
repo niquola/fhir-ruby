@@ -3,19 +3,19 @@ require 'active_support'
 require 'active_support/inflector'
 require "erb"
 
-Fhir::Meta::Resource.load(FHIR_FILE)
+Fhir::Resource.load(FHIR_FILE)
 file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
-Fhir::Meta::Datatype.load(file_name)
+Fhir::Datatype.load(file_name)
 
-describe "Fhir::Meta::Resource" do
+describe "Fhir::Resource" do
 
   example do
-    resources = Fhir::Meta::Resource.all
+    resources = Fhir::Resource.all
     resources.length.should == 49
   end
 
   example do
-    resource = Fhir::Meta::Resource.find("MedicationStatement")
+    resource = Fhir::Resource.find("MedicationStatement")
     resource.name.should == "MedicationStatement"
 
     resource.elements.length.should == 19

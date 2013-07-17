@@ -1,27 +1,27 @@
 require 'spec_helper'
 
-describe Fhir::Meta::Datatype do
+describe Fhir::Datatype do
   before(:each) do
     file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
-    Fhir::Meta::Datatype.load(file_name)
+    Fhir::Datatype.load(file_name)
   end
 
   it 'should detect simple types' do
-    Fhir::Meta::Datatype.find('integer').should be_simple
-    Fhir::Meta::Datatype.find('id').should be_simple
-    Fhir::Meta::Datatype.find('Element').should be_simple
-    Fhir::Meta::Datatype.find('QuantityCompararator').should be_simple
+    Fhir::Datatype.find('integer').should be_simple
+    Fhir::Datatype.find('id').should be_simple
+    Fhir::Datatype.find('Element').should be_simple
+    Fhir::Datatype.find('QuantityCompararator').should be_simple
 
-    Fhir::Meta::Datatype.find('Extension').should be_complex
-    Fhir::Meta::Datatype.find('Address').should be_complex
+    Fhir::Datatype.find('Extension').should be_complex
+    Fhir::Datatype.find('Address').should be_complex
   end
 
   it 'should parse attributes' do
-    Fhir::Meta::Datatype.all.each do |datatype|
+    Fhir::Datatype.all.each do |datatype|
       puts datatype.name
       if datatype.complex?
         datatype.attributes.each do |attribute|
-          attribute.type.should be_a Fhir::Meta::Datatype if attribute.type
+          attribute.type.should be_a Fhir::Datatype if attribute.type
           puts "  #{attribute.name} <#{attribute.type_name}> #{attribute.min}..#{attribute.max}"
         end
       elsif datatype.simple?
@@ -32,8 +32,8 @@ describe Fhir::Meta::Datatype do
   end
 
   it 'should detect and parse enum' do
-    Fhir::Meta::Datatype.find('Address').should_not be_enum
-    datatype = Fhir::Meta::Datatype.find('ObservationStatus')
+    Fhir::Datatype.find('Address').should_not be_enum
+    datatype = Fhir::Datatype.find('ObservationStatus')
 
     datatype.should be_enum
     datatype.enum_values.should =~ %w[registered interim final amended cancelled withdrawn]

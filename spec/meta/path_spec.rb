@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Fhir::Meta::Path do
-  let(:p) { Fhir::Meta::Path }
+describe Fhir::Path do
+  let(:p) { Fhir::Path }
 
   example do
     path = p.new(%w[a b c])

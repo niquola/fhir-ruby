@@ -13,13 +13,13 @@ module Fhir
 
     def elements(&block)
       load_meta
-      @elements = block.call(Fhir::Meta::ElementsBuilder
+      @elements = block.call(Fhir::ElementsBuilder
                              .monadic.resource_elements)
     end
 
     def load_meta
-      Fhir::Meta::Resource.load(@config.fhir_xml)
-      Fhir::Meta::Datatype.load(@config.datatypes_xsd)
+      Fhir::Resource.load(@config.fhir_xml)
+      Fhir::Datatype.load(@config.datatypes_xsd)
     end
   end
 end
