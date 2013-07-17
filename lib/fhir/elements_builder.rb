@@ -128,8 +128,8 @@ module Fhir
       el.type =~ /^Resource\(/
     end
 
-    def template(elements, &block)
-      template_str = block.call
+    def template(elements, path = nil, &block)
+      template_str = path ? File.read(path) : block.call
       template = ERB.new(template_str, nil, '%<>-')
       elements.each do |el|
         el.attributes[:code] = template.result(binding)

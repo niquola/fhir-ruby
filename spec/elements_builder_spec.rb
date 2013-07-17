@@ -134,16 +134,20 @@ describe "Fhir::ModelsBuilder" do
     res.size.should == 4
   end
 
-  it "template" do
-    m.monadic([
-      m.element(%w[a b])
-    ]).template do
+  it 'template' do
+    m.monadic([ m.element(%w[a b]) ])
+    .template do
       <<-ERB
 item: <%= el.path -%>
       ERB
     end
     .all
     .first.code.should == "item: a.b"
+  end
+
+  it 'should read template from file' do
+    m.monadic([ m.element(%w[a b]) ])
+    .template('spec/template.erb').all.first.code.should == 'item: a.b'
   end
 
   it "file" do
