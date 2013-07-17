@@ -11,10 +11,10 @@ module Fhir
       block.call(@config)
     end
 
-    def elements(&block)
+    def generate(&block)
       load_meta
-      @elements = block.call(Fhir::ElementsBuilder
-                             .monadic.resource_elements)
+      monad = Fhir::ElementsBuilder.monadic
+      monad.instance_eval(&block)
     end
 
     def load_meta

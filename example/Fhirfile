@@ -1,0 +1,12 @@
+# vim:ft=ruby
+configure do |cfg|
+  cfg.fhir_xml = '../spec/tmp/cache.xml'
+  cfg.datatypes_xsd = '../fhir-base.xsd'
+end
+
+generate do
+  resource_elements
+  .expand_with_datatypes
+  .reject_technical_elements
+  .print
+end
