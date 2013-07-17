@@ -46,6 +46,12 @@ module Fhir
           block.call(el, *args)
         end
       end
+
+      define_method "reject_#{name}" do |elements, *args|
+        elements.reject do |el|
+          block.call(el, *args)
+        end
+      end
     end
 
     def self.reject(name, &block)
@@ -72,6 +78,14 @@ module Fhir
       el.attributes[:simple]
     end
 
+    select :singular do |element|
+      element.path.size > 1 && element.max == '1'
+    end
+
+    select :resources do |element|
+      element.type =~ /^Resource\(/
+    end
+
     reject :technical_elements do |el|
       %w[extension text contained comparator].include?(el.path.last)
     end
@@ -80,9 +94,6 @@ module Fhir
       element.path.size > 1
     end
 
-    reject :singular do |element|
-      element.path.size > 1 && element.max == '1'
-    end
 
     def resource_elements(list = [])
       Resource.all.map do |resource|
@@ -104,6 +115,15 @@ module Fhir
           )
         )
       end.flatten
+    end
+
+    def set_simple_attribute(elements)
+      elements.map do |el|
+        type = Datatype.find(el.type)
+        el.clone.tap do |elem|
+          elem.attributes[:simple] = (type && type.simple?)
+        end
+      end
     end
 
     def complex_type_attributes(el)
@@ -131,9 +151,17 @@ module Fhir
     def template(elements, path = nil, &block)
       template_str = path ? File.read(path) : block.call
       template = ERB.new(template_str, nil, '%<>-')
+      template.filename = path if path
       elements.each do |el|
         el.attributes[:code] = template.result(binding)
       end
+    end
+
+    def render(elements, indent = 1)
+      spaces = '  '*indent
+      elements
+      .map{|e| spaces + e.code.split("\n").join("\n" + spaces)}
+      .join("\n")
     end
 
     def file(elements, folder_path, &block)
@@ -171,13 +199,11 @@ module Fhir
 
     def tableize(elements)
       elements.map do |el|
-        children = select_alone_descendants(elements, el.path)
-        unless children.empty?
-          el.clone.tap do |e|
-            e.elements = self.monadic(children)
-          end
+        children = tableize(select_alone_descendants(elements, el.path))
+        el.clone.tap do |e|
+          e.elements = self.monadic(children)
         end
-      end.compact
+      end
     end
 
     def select_alone_descendants(elements, path)

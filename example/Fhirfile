@@ -15,6 +15,7 @@ generate do
   }
 
   tables = resource_elements
+  .set_simple_attribute
   .expand_with_datatypes
   .reject_technical_elements
   .select_branch(['MedicationStatement'])

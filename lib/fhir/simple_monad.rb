@@ -27,6 +27,7 @@ module Fhir
       @mod.respond_to?(method)
     end
 
+    #TODO: exit from monad
     def method_missing(method, *args, &block)
       super unless @mod.respond_to?(method)
       result = @mod.send(method, *([@payload] + args), &block)

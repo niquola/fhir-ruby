@@ -1,0 +1,15 @@
+class <%= el.class_name %>
+  include Fhir::Composing
+  <% el.elements.select_children(el).select_simple_types.each do |element| -%>
+  composing_attribute :<%= element.path.last.underscore %>
+  <% end -%>
+<%= el.elements
+.select_alone_descendants(el)
+.select_children(el)
+.reject_simple_types
+.select_singular
+.reject_resources
+.template('composing_model.rb.erb')
+.render
+.all %>
+end

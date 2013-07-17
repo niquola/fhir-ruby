@@ -5,18 +5,27 @@ class <%= el.class_name %> < Fhir::Base
 <% end -%>
 
 <% el.elements.select_children(el).select_simple_types.each do |element| -%>
-  # @attribute: <%= element.path.last.underscore %>
   # <%= element.attributes[:comment] %>
+  # @attribute: <%= element.path.last.underscore %>
+<% end -%>
+<% el.elements.reject_singular.each do |element| -%>
+
+  # <%= element.attributes[:comment] %>
+  has_many :<%= element.path.last.underscore.pluralize %>,
+    class_name: '<%= element.class_name %>'
 <% end -%>
 
-<% el.elements.reject_singular.each do |element| -%>
-  # <%= element.attributes[:comment] %>
-  has_many :<%= element.path.last.underscore.pluralize %>
-<% end -%>
+<%= el.elements
+.select_alone_descendants(el)
+.select_children(el)
+.reject_simple_types
+.select_singular
+.reject_resources
+.template('composing_model.rb.erb')
+.render
+.all %>
 
 <% el.elements.select_simple_types.each do |element| -%>
   attr_accessor :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
-
 end
-# <%= el.attributes[:comment] %>
