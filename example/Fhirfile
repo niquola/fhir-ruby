@@ -21,44 +21,10 @@ generate do
   .apply_rules(rules)
   .tableize
 
-  tables.template do
-    <<-ERB
-# <%= el.attributes[:comment] %>
-class <%= el.class_name %> < Fhir::Base
-<% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
-  # <%= patient.attributes[:comment] %>
-  belongs_to :patient
-<% end -%>
-
-<% el.elements.select_children(el).select_simple_types.each do |element| -%>
-  # @attribute: <%= element.path.last.underscore %>
-  # <%= element.attributes[:comment] %>
-<% end -%>
-
-<% el.elements.reject_singular.each do |element| -%>
-  # <%= element.attributes[:comment] %>
-  has_many :<%= element.path.last.underscore.pluralize %>
-<% end -%>
-
-<% el.elements.select_simple_types.each do |element| -%>
-  attr_accessor :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
-
-end
-    ERB
-  end
+  tables
+  .template('model.rb.erb')
   .file(models_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 
-  tables.template do
-    <<-ERB
-create_table <%= el.path.to_a.join('_').underscore %> do |t|
-<% el.elements.select_simple_types.each do |element| -%>
-  t.string :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
-end
-    ERB
-  end
-  # .print(&:code)
-
-  # .print(&:code)
+  # tables
+  # .template('migration.rb.erb')
 end

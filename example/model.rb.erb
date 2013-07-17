@@ -1,0 +1,22 @@
+class <%= el.class_name %> < Fhir::Base
+<% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
+  # <%= patient.attributes[:comment] %>
+  belongs_to :patient
+<% end -%>
+
+<% el.elements.select_children(el).select_simple_types.each do |element| -%>
+  # @attribute: <%= element.path.last.underscore %>
+  # <%= element.attributes[:comment] %>
+<% end -%>
+
+<% el.elements.reject_singular.each do |element| -%>
+  # <%= element.attributes[:comment] %>
+  has_many :<%= element.path.last.underscore.pluralize %>
+<% end -%>
+
+<% el.elements.select_simple_types.each do |element| -%>
+  attr_accessor :<%= element.path.to_a.join('__').underscore %>
+<% end -%>
+
+end
+# <%= el.attributes[:comment] %>
