@@ -24,8 +24,4 @@ class <%= el.class_name %> < Fhir::Base
 .template('composing_model.rb.erb')
 .render
 .all %>
-
-<% el.elements.select_simple_types.each do |element| -%>
-  attr_accessor :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
 end

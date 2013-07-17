@@ -160,7 +160,7 @@ module Fhir
     def render(elements, indent = 1)
       spaces = '  '*indent
       elements
-      .map{|e| spaces + e.code.split("\n").join("\n" + spaces)}
+      .map{ |e| e.code.gsub(/^(.+)$/, "#{spaces}\\1") }
       .join("\n")
     end
 

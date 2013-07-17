@@ -6,6 +6,7 @@ end
 
 generate do
   models_folder = File.dirname(__FILE__)+ '/models/fhir'
+  migrations_folder = File.dirname(__FILE__)+ '/migrations'
   FileUtils.rm_rf(models_folder)
   rules = {
     %w[MedicationStatement dosage site coding] => {max: '1'},
@@ -26,6 +27,7 @@ generate do
   .template('model.rb.erb')
   .file(models_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 
-  # tables
-  # .template('migration.rb.erb')
+  tables
+  .template('migration.rb.erb')
+  .file(migrations_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 end
