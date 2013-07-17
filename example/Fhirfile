@@ -5,6 +5,8 @@ configure do |cfg|
 end
 
 generate do
+  models_folder = File.dirname(__FILE__)+ '/models/fhir'
+  FileUtils.rm_rf(models_folder)
   rules = {
     %w[MedicationStatement dosage site coding] => {max: '1'},
     %w[MedicationStatement dosage route coding] => {max: '1'},
@@ -15,9 +17,37 @@ generate do
   tables = resource_elements
   .expand_with_datatypes
   .reject_technical_elements
-  .select_descendants(['MedicationStatement'])
+  .select_branch(['MedicationStatement'])
   .apply_rules(rules)
   .tableize
+
+  tables.template do
+    <<-ERB
+# <%= el.attributes[:comment] %>
+class <%= el.class_name %> < Fhir::Base
+<% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
+  # <%= patient.attributes[:comment] %>
+  belongs_to :patient
+<% end -%>
+
+<% el.elements.select_children(el).select_simple_types.each do |element| -%>
+  # @attribute: <%= element.path.last.underscore %>
+  # <%= element.attributes[:comment] %>
+<% end -%>
+
+<% el.elements.reject_singular.each do |element| -%>
+  # <%= element.attributes[:comment] %>
+  has_many :<%= element.path.last.underscore.pluralize %>
+<% end -%>
+
+<% el.elements.select_simple_types.each do |element| -%>
+  attr_accessor :<%= element.path.to_a.join('__').underscore %>
+<% end -%>
+
+end
+    ERB
+  end
+  .file(models_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 
   tables.template do
     <<-ERB
@@ -28,20 +58,7 @@ create_table <%= el.path.to_a.join('_').underscore %> do |t|
 end
     ERB
   end
-  .print(&:code)
+  # .print(&:code)
 
-  tables.template do
-    <<-ERB
-class <%= el.class_name %>
-<% el.elements.select_simple_types.each do |element| -%>
-  attr_accessor :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
-<% el.elements.reject_singular.each do |element| -%>
-  has_many :<%= element.path.last.underscore.pluralize %>
-<% end -%>
-end
-    ERB
-  end
-  .file(File.dirname(__FILE__)+ '/models'){|el| el.path.to_a.join("_").underscore + '.rb'}
   # .print(&:code)
 end

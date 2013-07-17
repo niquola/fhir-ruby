@@ -60,6 +60,10 @@ module Fhir
       el.path < to_path(path)
     end
 
+    select :branch do |el, path|
+      el.path <= to_path(path)
+    end
+
     select :children do |el, path|
       to_path(path).child?(el.path)
     end
@@ -84,7 +88,7 @@ module Fhir
       Resource.all.map do |resource|
         resource.elements.map do |el|
           element(el.path,
-                  short: el.definition.short,
+                  comment: el.definition.short,
                   max: el.definition.max,
                   min: el.definition.min,
                   type: el.definition.type)
@@ -115,6 +119,7 @@ module Fhir
                 max: attr.max == 'unbounded' ? '*' : attr.max,
                 min: attr.min,
                 simple: attr.type.try(:simple?),
+                comment: attr.type.try(:simple?),
                 datatype_attr: true)
       end
     end
