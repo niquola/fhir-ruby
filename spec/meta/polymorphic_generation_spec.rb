@@ -11,23 +11,23 @@ describe 'Polymorphic Generation' do
       %w[MedicationStatement identifier] => {max: '1'}
     }
 
-    tables =builder.monadic
+    tables = builder.monadic
     .resource_elements
     .expand_with_datatypes
-    .filter_technical_elements
-    .filter_descendants(['MedicationStatement'])
+    .reject_technical_elements
+    .select_descendants(['MedicationStatement'])
     .apply_rules(rules)
     .tableize
     .print do |el|
       p el.elements.send(:mod).methods
-      el.elements.filter_simple_types
+      el.elements.select_simple_types
     end
 
 
     tables.template do
       <<-ERB
 create_table <%= el.path.to_a.join('_').underscore %> do |t|
-<% el.elements.filter_simple_types.each do |element| -%>
+<% el.elements.select_simple_types.each do |element| -%>
   t.string :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 end
@@ -38,7 +38,7 @@ end
     tables.template do
       <<-ERB
 class <%= el.class_name %>
-<% el.elements.filter_simple_types.each do |element| -%>
+<% el.elements.select_simple_types.each do |element| -%>
   attr_accessor :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 <% el.elements.reject_singular.each do |element| -%>

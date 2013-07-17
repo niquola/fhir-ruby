@@ -76,6 +76,10 @@ module Fhir
         self.class.new(to_a + other_path.to_a)
       end
 
+      def join(*args)
+        concat(args)
+      end
+
       def +(other_path)
         concat(other_path)
       end

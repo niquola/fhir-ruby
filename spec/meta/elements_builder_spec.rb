@@ -31,16 +31,16 @@ describe "Fhir::Meta::ModelsBuilder" do
     .should_not be_nil
   end
 
-  it "filter descendants" do
+  it "select descendants" do
     res = elements
-    .filter_descendants(%w[a b])
+    .select_descendants(%w[a b])
     .all
 
     res.size.should == 1
     res.first.path.to_a.should == %w[a b c]
   end
 
-  it 'should filter children' do
+  it 'should select children' do
     m.monadic([
       m.element(['Entity']),
       m.element(['Entity','prop']),
@@ -50,7 +50,7 @@ describe "Fhir::Meta::ModelsBuilder" do
       m.element(['Entity','ass2'], max: '1'),
       m.element(['Entity','ass1','prop4'])
     ])
-    .filter_children(['Entity']).all
+    .select_children(['Entity']).all
     .map(&:path)
     .map(&:last)
     .sort.should == %w[prop prop2 ass1 ass2].sort
@@ -66,30 +66,30 @@ describe "Fhir::Meta::ModelsBuilder" do
     el.should_not be_nil
   end
 
-  it "filter_technical_elements" do
+  it "reject_technical_elements" do
 
     m.monadic([m.element(['one','text'])])
-    .filter_technical_elements
+    .reject_technical_elements
     .all
     .should == []
 
     m.monadic([m.element(['one','text'])])
-    .filter_technical_elements
+    .reject_technical_elements
     .all
     .should == []
 
     m.monadic([m.element(['one','extension'])])
-    .filter_technical_elements
+    .reject_technical_elements
     .all
     .should == []
 
     m.monadic([m.element(['one','contained'])])
-    .filter_technical_elements
+    .reject_technical_elements
     .all
     .should == []
 
     m.monadic([m.element(['one','two'])])
-    .filter_technical_elements
+    .reject_technical_elements
     .all
     .should_not be_empty
   end
@@ -119,7 +119,7 @@ describe "Fhir::Meta::ModelsBuilder" do
   end
 
 
-  it 'filter_alone_descendants' do
+  it 'select_alone_descendants' do
     res = m.monadic([
       m.element(['Entity']),
       m.element(['Entity','prop']),
@@ -129,7 +129,7 @@ describe "Fhir::Meta::ModelsBuilder" do
       m.element(['Entity','ass1','prop3']), #should be removed
       m.element(['Entity','ass1','prop4']), #should be removed
     ])
-    .filter_alone_descendants(['Entity'])
+    .select_alone_descendants(['Entity'])
     .all
 
     res.map(&:path).map(&:last).should_not include('prop3')
