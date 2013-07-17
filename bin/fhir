@@ -2,4 +2,4 @@
 
 require 'fhir'
 
-config = File.read('Fhirfile')
+cli = Fhir::Cli.new
