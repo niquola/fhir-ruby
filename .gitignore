@@ -17,4 +17,5 @@ test/version_tmp
 tmp
 *.sw?
 *~
-
+example/models
+example/migrations

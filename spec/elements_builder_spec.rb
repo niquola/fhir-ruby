@@ -147,7 +147,7 @@ item: <%= el.path -%>
   end
 
   it "file" do
-    tmp_folder = File.join(File.dirname(__FILE__), 'tmp')
+    tmp_folder = File.join(File.dirname(__FILE__), 'tmp/models')
     FileUtils.rm_rf(tmp_folder)
 
     m.monadic([
