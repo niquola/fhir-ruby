@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe Fhir::Datatype do
-  before(:each) do
-    file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
-    Fhir::Datatype.load(file_name)
-  end
-
   it 'should detect simple types' do
     Fhir::Datatype.find('integer').should be_simple
     Fhir::Datatype.find('id').should be_simple

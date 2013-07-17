@@ -1,11 +1,6 @@
 require 'spec_helper'
 require 'active_support'
 require 'active_support/inflector'
-require "erb"
-
-Fhir::Resource.load(FHIR_FILE)
-file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
-Fhir::Datatype.load(file_name)
 
 describe "Fhir::Resource" do
 
