@@ -27,7 +27,9 @@ generate do
   .template('model.rb.erb')
   .file(models_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 
-  tables
-  .template('migration.rb.erb')
-  .file(migrations_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
+  schema = tables.template('migration.rb.erb').all.map(&:code).uniq.join("\n")
+  schema_file_name = File.join(migrations_folder, 'schema.rb')
+  File.open(schema_file_name, 'w') { |f| f.write "execute('drop schema if exists fhir cascade; create schema fhir')\n" }
+  File.open(File.join(migrations_folder, 'schema.rb'), 'a') { |f| f.write(schema) }
+  # .file(migrations_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
 end
