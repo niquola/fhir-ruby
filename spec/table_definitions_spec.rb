@@ -5,27 +5,49 @@ describe Fhir::TableDefinitions do
   let(:elements) do
     m.monadic(
       [
-        m.element(%w[Entity], type: 'Resource'),
-        m.element(%w[Entity single_string], type: :string, max: '1'),
-        m.element(%w[Entity multiple_strings], type: :string, max: '*'),
-        m.element(%w[Entity ref], max: '*'),
-        m.element(%w[Entity ref field2], type: :integer, max: '1')
+        m.element(%w[Person], type: 'Resource'),
+
+        m.element(%w[Person name], type: 'string', max: '1'),
+        m.element(%w[Person age], type: 'integer', max: '1'),
+        m.element(%w[Person titles], type: 'string', max: '*'),
+
+        m.element(%w[Person contact_info], type: nil, max: '1'),
+        m.element(%w[Person contact_info phone], type: 'string', max: '1'),
+
+        m.element(%w[Person addresses], type: nil, max: '*'),
+        m.element(%w[Person addresses street], type: 'string', max: '1'),
+
+        m.element(%w[Person organization], type: 'Resource(Organization)', max: '1'),
+        m.element(%w[Person employees], type: 'Resource(Person)', max: '*'),
       ]
-    )
+    ).set_simple_attribute
   end
 
-  let(:table_definition) do
-    elements.select_branch(['Entity']).table_definitions.all.first
+  let(:person_table_definition) do
+    elements.select_branch(['Person']).table_definitions.select_table('people')[0]
+  end
+
+  let(:title_table_definition) do
+    elements.select_branch(['Person']).table_definitions.select_table('person_titles')[0]
   end
 
   it 'should have singular attributes' do
-    table_definition.should have_column :string, 'single_string'
-    table_definition.should_not have_column :string, 'multiple_string'
+    person_table_definition.should have_column 'string', 'name'
+    person_table_definition.should have_column 'integer', 'age'
+  end
+
+  it 'should create tables for plural attributes' do
+    title_table_definition.should have_column 'string', 'value'
+  end
+
+  it 'should have singular complex attribute fields' do
+    person_table_definition.should have_column 'string', 'contact_info__phone'
   end
 
   RSpec::Matchers.define :have_column do |type, name|
     match do |table_definition|
-      table_definition.columns.any? { |c| c.name == name && c.type == type }
+      table_definition &&
+        table_definition.columns.any? { |c| c.name == name && c.type == type }
     end
   end
 end

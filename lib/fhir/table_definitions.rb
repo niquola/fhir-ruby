@@ -2,7 +2,7 @@ require 'active_support'
 
 module Fhir
   module TableDefinitions
-    extend ActiveSupport::Concern
+    include Dsl
 
     def table_definitions(elements)
       monadic(elements).select_resources.all.map do |resource|
@@ -19,23 +19,43 @@ module Fhir
       parent = opts[:parent]
       table = opts[:table]
       attributes = monadic(elements).select_attributes(parent.path)
-      attributes.select_singular.all.each do |attr|
-        table.columns << ColumnDefinition.new(attr.type, attr.path.last)
-      end
-      ## prefix = opts[:prefix] || ''
+      singular_attributes = attributes.select_singular
+      plural_attributes = attributes.select_plural
 
-      #attributes = monadic([resource]).attributes
-      #attributes.singular.each do |attr|
-      #  table.columns << ColumnDefinition.new(attr.type, attr.name)
-      #end
-      #attributes.plural.each do |attr|
-      #  scheme << (attr_table = TableDefinition.new("#{resource.name.underscore}_#{attr.name.tableize}"))
-      #  # add_to_scheme(scheme, Identifier, table: 'medication_statement_identifiers')
-      #  monadic([resource]).type.add_to_scheme(scheme, table: attr_table)
-      #end
-      #monadic([resource]).references.each do |ref|
-      #  table.references << ColumnDefinition.new(nil, ref.name)
-      #end
+      singular_attributes.select_simple.each do |attr|
+        table.columns << ColumnDefinition.new(attr.type, attr.path[1..-1].to_a.join('__'))
+      end
+
+      singular_attributes.reject_simple.each do |attr|
+        if attr.type.present?
+
+        else
+          monadic(elements).select_branch(attr.path).add_to_scheme(scheme, parent: attr, table: table)
+        end
+      end
+
+      singular_attributes.select_complex.each do |attr|
+        singular_attributes.select_branch(attr.path).add_to_scheme(scheme, parent: attr, table: table)
+      end
+
+      # plural_attributes.select_complex.each do |attr|
+      #   table_name = "#{parent.path.last.underscore}_#{attr.path.last.tableize}"
+      #   attr_table = TableDefinition.new(table_name)
+      #   scheme << attr_table
+      #   data_type = data_type_elements.select_branch([attr.type])
+      #   data_type.add_to_scheme(scheme, table: attr_table, parent: data_type.root[0])
+      # end
+
+      plural_attributes.select_simple.each do |attr|
+        table_name = "#{parent.path.last.underscore}_#{attr.path.last.tableize}"
+        attr_table = TableDefinition.new(table_name)
+        attr_table.columns << ColumnDefinition.new(attr.type, 'value')
+        scheme << attr_table
+      end
+    end
+
+    select :table do |element, table_name|
+      element.table_name == table_name
     end
 
     class TableDefinition
@@ -48,7 +68,6 @@ module Fhir
         @columns = []
         @references = []
       end
-
     end
 
     class ColumnDefinition

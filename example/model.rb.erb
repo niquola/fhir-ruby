@@ -4,7 +4,7 @@ class <%= el.class_name %> < Fhir::Base
   belongs_to :patient
 <% end -%>
 
-<% el.elements.select_children(el).select_simple_types.each do |element| -%>
+<% el.elements.select_children(el).select_simple.each do |element| -%>
   # <%= element.attributes[:comment] %>
   # @attribute: <%= element.path.last.underscore %>
 <% end -%>
@@ -18,7 +18,7 @@ class <%= el.class_name %> < Fhir::Base
 <%= el.elements
 .select_alone_descendants(el)
 .select_children(el)
-.reject_simple_types
+.reject_simple
 .select_singular
 .reject_resources
 .template('composing_model.rb.erb')

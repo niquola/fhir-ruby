@@ -6,15 +6,16 @@ require 'erb'
 module Fhir
   module ElementsBuilder
     include TableDefinitions
+    include Dsl
 
     def to_path(path)
       case path
-        when ::Fhir::Path
-          path
-        when ::Fhir::Element
-          path.path
-        else
-          ::Fhir::Path.new(path)
+      when ::Fhir::Path
+        path
+      when ::Fhir::Element
+        path.path
+      else
+        ::Fhir::Path.new(path)
       end
     end
 
@@ -43,28 +44,6 @@ module Fhir
       elements.select(&block)
     end
 
-    def self.select(name, &block)
-      define_method "select_#{name}" do |elements, *args|
-        elements.select do |el|
-          block.call(el, *args)
-        end
-      end
-
-      define_method "reject_#{name}" do |elements, *args|
-        elements.reject do |el|
-          block.call(el, *args)
-        end
-      end
-    end
-
-    def self.reject(name, &block)
-      define_method "reject_#{name}" do |elements, *args|
-        elements.reject do |el|
-          block.call(el, *args)
-        end
-      end
-    end
-
     select :resources do |el|
       el.respond_to?(:type) && el.type == 'Resource'
     end
@@ -85,12 +64,24 @@ module Fhir
       to_path(path).child?(el.path)
     end
 
-    select :simple_types do |el|
+    select :simple do |el|
       el.attributes[:simple]
     end
 
     select :singular do |element|
       element.path.size > 1 && element.max == '1'
+    end
+
+    select :plural do |element|
+      element.path.size > 1 && element.max == '*'
+    end
+
+    select :references do |element|
+      element.respond_to?(:type) && element.type =~ /^Resource/
+    end
+
+    select :complex do |element|
+      !element.attributes[:simple] && element.respond_to?(:type) && element.type.present?
     end
 
     reject :technical_elements do |el|

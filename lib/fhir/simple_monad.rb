@@ -21,6 +21,10 @@ module Fhir
       @payload
     end
 
+    def [](n)
+      resolve[n]
+    end
+
     alias :all :resolve
 
     def respond_to?(method)

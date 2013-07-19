@@ -3,7 +3,7 @@ create_table 'fhir.<%= el.path.to_a.join('_').underscore %>' do |t|
   t.references :patient
 <% end -%>
 <% #TODO: back reference to parent_id %>
-<% el.elements.select_simple_types.each do |element| -%>
+<% el.elements.select_simple.each do |element| -%>
   t.string :<%= (element.path - el.path).to_a.join('__').underscore %>
 <% end -%>
 end

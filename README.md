@@ -43,14 +43,14 @@ tables = resource_elements
 .tableize
 .print do |el|
   p el.elements.send(:mod).methods
-  el.elements.filter_simple_types
+  el.elements.select_simple
 end
 
 
 tables.template do
   <<-ERB
 create_table <%= el.path.to_a.join('_').underscore %> do |t|
-<% el.elements.filter_simple_types.each do |element| -%>
+<% el.elements.select_simple.each do |element| -%>
   t.string :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 end
@@ -61,7 +61,7 @@ end
 tables.template do
   <<-ERB
 class <%= el.class_name %>
-<% el.elements.filter_simple_types.each do |element| -%>
+<% el.elements.select_simple.each do |element| -%>
   attr_accessor :<%= element.path.to_a.join('__').underscore %>
 <% end -%>
 <% el.elements.reject_singular.each do |element| -%>

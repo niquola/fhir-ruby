@@ -10,4 +10,5 @@ module Fhir
   autoload :SimpleMonad, 'fhir/simple_monad'
   autoload :Element, 'fhir/element'
   autoload :TableDefinitions, 'fhir/table_definitions'
+  autoload :Dsl, 'fhir/dsl'
 end
