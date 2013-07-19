@@ -6,17 +6,17 @@ module Fhir
   module ElementsBuilder
     def to_path(path)
       case path
-      when ::Fhir::Path
-        path
-      when ::Fhir::Element
-        path.path
-      else
-        ::Fhir::Path.new(path)
+        when ::Fhir::Path
+          path
+        when ::Fhir::Element
+          path.path
+        else
+          ::Fhir::Path.new(path)
       end
     end
 
     def monadic(list=[])
-      SimpleMonad.new(list,[::Fhir::ElementsBuilder])
+      SimpleMonad.new(list, [::Fhir::ElementsBuilder])
     end
 
     def element(path_array, attrs = {})
@@ -24,7 +24,7 @@ module Fhir
     end
 
     def find_by_path(list, path)
-      list.select {|el| el.path == to_path(path) }
+      list.select { |el| el.path == to_path(path) }
     end
 
     def sort(elements, &block)
@@ -160,7 +160,7 @@ module Fhir
     def render(elements, indent = 1)
       spaces = '  '*indent
       elements
-      .map{ |e| e.code.gsub(/^(.+)$/, "#{spaces}\\1") }
+      .map { |e| e.code.gsub(/^(.+)$/, "#{spaces}\\1") }
       .join("\n")
     end
 
@@ -169,7 +169,7 @@ module Fhir
       elements.each do |el|
         content = el.code
         file_name = block.call(el)
-        File.open(File.join(folder_path, file_name), 'w') {|f| f<< content }
+        File.open(File.join(folder_path, file_name), 'w') { |f| f<< content }
       end
     end
 
@@ -218,12 +218,9 @@ module Fhir
     end
 
     def apply_rules(elements, rules)
-      elements.each do |element|
-        rules.each do |path, rule|
-          if element.path == path
-            element.attributes.merge!(rule)
-          end
-        end
+      elements.each_with_object([]) do |element, acc|
+        _, overrides = rules.find { |path, _| to_path(path) == element.path }
+        acc << (overrides ? element.dup.tap { |el| el.attributes.merge!(overrides) } : element)
       end
     end
 

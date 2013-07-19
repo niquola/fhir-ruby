@@ -51,7 +51,6 @@ module Fhir
     def simple?
       return @simple unless @simple.nil?
       @simple = SIMPLE_TYPES.include?(name) || enum?
-      @simple
     end
 
     def complex?
