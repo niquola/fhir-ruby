@@ -16,17 +16,20 @@ generate do
     %w[MedicationStatement identifier] => {max: '1'}
   }
 
-  tables = resource_elements
+  resources = resource_elements
   .set_simple_attribute
   .expand_with_datatypes
   .reject_technical_elements
   .select_branch(['MedicationStatement'])
   .apply_rules(rules)
-  .tableize
+
+  table_definitions = resources.table_definitions
+
+  tables = resources.tableize
 
   tables
   .template('model.rb.erb')
-  .file(models_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
+  .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
 
   schema = tables.template('migration.rb.erb').all.map(&:code).uniq.join("\n")
   schema_file_name = File.join(migrations_folder, 'schema.rb')

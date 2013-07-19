@@ -9,7 +9,7 @@ module Fhir
       end
 
       def definition
-        @definition = Definition.new(node.xpath('./definition').first)
+        @definition ||= Definition.new(node.xpath('./definition').first)
       end
 
       def name

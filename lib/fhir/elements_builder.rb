@@ -1,9 +1,12 @@
 require 'active_support'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
-require "erb"
+require 'erb'
+
 module Fhir
   module ElementsBuilder
+    include TableDefinitions
+
     def to_path(path)
       case path
         when ::Fhir::Path
@@ -62,6 +65,14 @@ module Fhir
       end
     end
 
+    select :resources do |el|
+      el.respond_to?(:type) && el.type == 'Resource'
+    end
+
+    select :attributes do |el, path|
+      to_path(path).child?(el.path) && !is_resource_ref?(el)
+    end
+
     select :descendants do |el, path|
       el.path < to_path(path)
     end
@@ -80,10 +91,6 @@ module Fhir
 
     select :singular do |element|
       element.path.size > 1 && element.max == '1'
-    end
-
-    select :resources do |element|
-      element.type =~ /^Resource\(/
     end
 
     reject :technical_elements do |el|
@@ -145,7 +152,7 @@ module Fhir
     end
 
     def is_resource_ref?(el)
-      el.type =~ /^Resource\(/
+      el.respond_to?(:type) && el.type =~ /^Resource\(/
     end
 
     def template(elements, path = nil, &block)

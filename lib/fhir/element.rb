@@ -13,6 +13,10 @@ module Fhir
       @elements ||= []
     end
 
+    def respond_to?(attr_name)
+      super || @attributes.key?(attr_name.to_sym)
+    end
+
     def method_missing(attr)
       if @attributes.key?(attr.to_sym)
         @attributes[attr.to_sym]

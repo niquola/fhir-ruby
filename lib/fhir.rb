@@ -9,4 +9,5 @@ module Fhir
   autoload :Path, 'fhir/path'
   autoload :SimpleMonad, 'fhir/simple_monad'
   autoload :Element, 'fhir/element'
+  autoload :TableDefinitions, 'fhir/table_definitions'
 end
