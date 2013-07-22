@@ -32,8 +32,12 @@ module Fhir
       subpath.to_s =~ /^#{self.to_s}/
     end
 
-    def [](range)
-      self.class.new(to_a[range])
+    def [](range_or_index)
+      if range_or_index.is_a?(Range)
+        self.class.new(to_a[range_or_index])
+      else
+        to_a[range_or_index]
+      end
     end
 
     def >=(subpath)
