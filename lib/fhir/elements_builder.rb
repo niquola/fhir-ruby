@@ -44,6 +44,10 @@ module Fhir
       elements.select(&block)
     end
 
+    def reject(elements, &block)
+      elements.reject(&block)
+    end
+
     select :resources do |el|
       el.respond_to?(:type) && el.type == 'Resource'
     end

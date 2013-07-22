@@ -93,6 +93,10 @@ describe Fhir::TableDefinitions do
     identifiers_table_definition.should have_column 'string', 'key'
   end
 
+  it 'should have resource references' do
+
+  end
+
   RSpec::Matchers.define :have_column do |type, name|
     match do |table_definition|
       table_definition &&
