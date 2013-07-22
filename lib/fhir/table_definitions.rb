@@ -18,7 +18,7 @@ module Fhir
     def add_to_scheme(elements, scheme, opts = {})
       parent = opts[:parent]
       table = opts[:table]
-      path = opts[:path] || parent.path
+      path = opts[:path] || parent.path[1..-1]
       attributes = monadic(elements).select_attributes(parent.path)
       singular_attributes = attributes.select_singular
       plural_attributes = attributes.select_plural
@@ -35,25 +35,16 @@ module Fhir
       end
 
       singular_attributes.reject_simple.each do |attr|
-        if attr.type.present?
-
-        else
-          monadic(elements).select_branch(attr.path).add_to_scheme(scheme, parent: attr, table: table,
-                                                                   path: path + attr.path[-1..-1])
-        end
+        monadic(elements).select_branch(attr.path).add_to_scheme(scheme, parent: attr, table: table,
+                                                                 path: path + attr.path[-1..-1])
       end
 
       plural_attributes.reject_simple.each do |attr|
         table_name = (attr.path[0...-1].to_a.map(&:underscore) + [attr.path.last.tableize]).join('_')
         attr_table = TableDefinition.new(table_name)
         scheme << attr_table
-        if attr.type.present?
-          #data_type = data_type_elements.select_branch([attr.type])
-          #data_type.add_to_scheme(scheme, table: attr_table, parent: data_type.root[0])
-        else
-          monadic(elements).select_branch(attr.path).add_to_scheme(scheme, table: attr_table, parent: attr,
-                                                                   path: to_path([]))
-        end
+        monadic(elements).select_branch(attr.path).add_to_scheme(scheme, table: attr_table, parent: attr,
+                                                                 path: to_path([]))
       end
     end
 

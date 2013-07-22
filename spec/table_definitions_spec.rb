@@ -43,11 +43,9 @@ describe Fhir::TableDefinitions do
         m.element(%w[Person organization], type: 'Resource(Organization)', max: '1'),
 
         # Resource ref (plural)
-        m.element(%w[Person employees], type: 'Resource(Person)', max: '*'),
-
-        m.element(%w[Telecom], type: nil, max: '*'),
+        m.element(%w[Person employees], type: 'Resource(Person)', max: '*')
       ]
-    ).set_simple_attribute
+    ).set_simple_attribute.expand_with_datatypes
   end
 
   let(:person_table_definition) do
@@ -66,6 +64,10 @@ describe Fhir::TableDefinitions do
     elements.select_branch(%w(Person)).table_definitions.select_table('person_addresses_phones')[0]
   end
 
+  let(:identifiers_table_definition) do
+    elements.select_branch(%w(Person)).table_definitions.select_table('person_identifiers')[0]
+  end
+
   it 'should have singular attributes' do
     person_table_definition.should have_column 'string', 'name'
     person_table_definition.should have_column 'integer', 'age'
@@ -78,6 +80,8 @@ describe Fhir::TableDefinitions do
   it 'should have singular complex attribute fields' do
     person_table_definition.should have_column 'string', 'contact_info__phone'
     person_table_definition.should have_column 'string', 'contact_info__mail_address__street'
+
+    person_table_definition.should have_column 'decimal', 'working_hours__low__value'
   end
 
   it 'should have plural complex attribute fields' do
@@ -85,6 +89,8 @@ describe Fhir::TableDefinitions do
     addresses_table_definition.should have_column 'string', 'lines__line1'
     addresses_phones_table_definition.should have_column 'string', 'code'
     addresses_phones_table_definition.should have_column 'string', 'number'
+
+    identifiers_table_definition.should have_column 'string', 'key'
   end
 
   RSpec::Matchers.define :have_column do |type, name|
