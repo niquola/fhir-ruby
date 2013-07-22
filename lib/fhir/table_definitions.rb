@@ -4,35 +4,38 @@ module Fhir
   module TableDefinitions
     include Dsl
 
-    def table_definitions(elements)
-      scheme = []
-      monadic(elements).select_resources.add_to_scheme(scheme, elements)
-      scheme
+    def resource_tables(elements)
+      monadic(elements).select_resources.table_definitions(elements)
     end
 
-    def add_to_scheme(parent_elements, scheme, elements, opts = {})
-      parent_elements.each do |parent|
-        table = opts[:table] || make_element_table(scheme, parent)
+    def table_definitions(parent_elements, elements, opts = {})
+      tables = []
+      parent_elements.map do |parent|
+        table = opts[:table] || make_element_table(tables, parent)
         base_path = opts[:base_path] || parent.path
-        branch_elements = monadic(elements).select_branch(parent.path)
-        attributes = branch_elements.select_attributes(parent.path)
+
+        branch = monadic(elements).select_branch(parent.path)
+        attributes = branch.select_attributes(parent.path)
         singular_attributes = attributes.select_singular
         plural_attributes = attributes.select_plural
+
+        branch_elements = branch.all
 
         singular_attributes.select_simple.each do |attr|
           table.columns << ColumnDefinition.new(attr.type, (attr.path - base_path).to_a.map(&:underscore).join('__'))
         end
 
-        plural_attributes.select_simple.each do |attr|
-          attr_table = make_element_table(scheme, attr)
+        plural_attributes.select_simple.all.map do |attr|
+          attr_table = make_element_table(tables, attr)
           attr_table.columns << ColumnDefinition.new(attr.type, 'value')
+          attr_table
         end
 
-        singular_attributes.reject_simple.
-          add_to_scheme(scheme, branch_elements, table: table, base_path: base_path)
-
-        plural_attributes.reject_simple.add_to_scheme(scheme, branch_elements)
+        tables +=
+          singular_attributes.reject_simple.table_definitions(branch_elements, table: table, base_path: base_path).all
+        tables += plural_attributes.reject_simple.table_definitions(branch_elements).all
       end
+      tables
     end
 
     select :table do |element, table_name|

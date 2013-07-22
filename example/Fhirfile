@@ -23,7 +23,7 @@ generate do
   .select_branch(['MedicationStatement'])
   .apply_rules(rules)
 
-  table_definitions = resources.table_definitions
+  table_definitions = resources.resource_tables
 
   tables = resources.tableize
 

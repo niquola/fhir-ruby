@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe Fhir::TableDefinitions do
-  before(:each) do
-    #Fhir::Datatype.types = [
-    #]
-  end
-
   let(:m) { Fhir::ElementsBuilder }
   let(:elements) do
     m.monadic(
@@ -49,23 +44,23 @@ describe Fhir::TableDefinitions do
   end
 
   let(:person_table_definition) do
-    elements.select_branch(%w(Person)).table_definitions.select_table('people')[0]
+    elements.select_branch(%w(Person)).resource_tables.select_table('people')[0]
   end
 
   let(:title_table_definition) do
-    elements.select_branch(%w(Person)).table_definitions.select_table('person_titles')[0]
+    elements.select_branch(%w(Person)).resource_tables.select_table('person_titles')[0]
   end
 
   let(:addresses_table_definition) do
-    elements.select_branch(%w(Person)).table_definitions.select_table('person_addresses')[0]
+    elements.select_branch(%w(Person)).resource_tables.select_table('person_addresses')[0]
   end
 
   let(:addresses_phones_table_definition) do
-    elements.select_branch(%w(Person)).table_definitions.select_table('person_addresses_phones')[0]
+    elements.select_branch(%w(Person)).resource_tables.select_table('person_addresses_phones')[0]
   end
 
   let(:identifiers_table_definition) do
-    elements.select_branch(%w(Person)).table_definitions.select_table('person_identifiers')[0]
+    elements.select_branch(%w(Person)).resource_tables.select_table('person_identifiers')[0]
   end
 
   it 'should have singular attributes' do
