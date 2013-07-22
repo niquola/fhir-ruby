@@ -41,12 +41,10 @@ module Fhir
         tables += plural_attributes.reject_simple.table_definitions(
           branch_elements, back_reference: ReferenceDefinition.new(base_path.first.underscore, table_name: table.table_name)).all
         branch.select_references.select_singular.each do |reference|
-          next if reference.type == 'Resource.Inline'
           table.references << make_reference(reference)
         end
 
         branch.select_references.select_plural.each do |reference|
-          next if reference.type == 'Resource.Inline'
           reference_table = make_element_table(tables, reference)
           reference_table.references << make_reference(reference)
           reference_table.references << ReferenceDefinition.new(base_path.last.underscore, table_name: table.table_name)

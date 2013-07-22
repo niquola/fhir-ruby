@@ -111,11 +111,15 @@ module Fhir
 
     def expand_with_datatypes(elements)
       elements + elements.map do |el|
-        expand_with_datatypes(
-          element_from_datatype_attrs(
-            el, complex_type_attributes(el)
+        if el.path.size > 1
+          expand_with_datatypes(
+            element_from_datatype_attrs(
+              el, complex_type_attributes(el)
+            )
           )
-        )
+        else
+          []
+        end
       end.flatten
     end
 
