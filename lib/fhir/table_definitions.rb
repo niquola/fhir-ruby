@@ -5,7 +5,7 @@ module Fhir
     include Dsl
 
     def resource_tables(elements)
-      monadic(elements).select_resources.table_definitions(elements)
+      monadic(elements).select_resources.table_definitions(elements).all
     end
 
     def table_definitions(parent_elements, elements, opts = {})
@@ -18,6 +18,7 @@ module Fhir
         attributes = branch.select_attributes(parent.path)
         singular_attributes = attributes.select_singular
         plural_attributes = attributes.select_plural
+        references = branch.select_children(parent.path).select_references
 
         branch_elements = branch.all
 
@@ -40,20 +41,20 @@ module Fhir
           singular_attributes.reject_simple.table_definitions(branch_elements, table: table, base_path: base_path).all
         tables += plural_attributes.reject_simple.table_definitions(
           branch_elements, back_reference: ReferenceDefinition.new(base_path.first.underscore, table_name: table.table_name)).all
-        branch.select_references.select_singular.each do |reference|
-          table.references << make_reference(reference)
+        references.select_singular.each do |reference|
+          table.references << make_reference(reference, reference.path - base_path)
         end
 
-        branch.select_references.select_plural.each do |reference|
+        references.select_plural.each do |reference|
           reference_table = make_element_table(tables, reference)
-          reference_table.references << make_reference(reference)
+          reference_table.references << make_reference(reference, reference.path[-1..-1])
           reference_table.references << ReferenceDefinition.new(base_path.last.underscore, table_name: table.table_name)
         end
       end
       tables
     end
 
-    def make_reference(reference)
+    def make_reference(reference, path)
       opts = {}
       if %w[Resource Resource(Any) ResourceReference].include? reference.type
         opts[:polymorphic] = true
@@ -65,7 +66,7 @@ module Fhir
           opts[:table_name] = types.first.tableize
         end
       end
-      ReferenceDefinition.new(reference.path.last.underscore, opts)
+      ReferenceDefinition.new(path.to_a.map(&:underscore).join('__'), opts)
     end
 
     select :table do |element, table_name|

@@ -158,8 +158,11 @@ module Fhir
       template_str = path ? File.read(path) : block.call
       template = ERB.new(template_str, nil, '%<>-')
       template.filename = path if path
-      elements.each do |el|
-        el.attributes[:code] = template.result(binding)
+      # elements.each do |el|
+      #   el.attributes[:code] = template.result(binding)
+      # end
+      elements.map do |el|
+        template.result(binding)
       end
     end
 

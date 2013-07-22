@@ -1,9 +1,13 @@
-create_table 'fhir.<%= el.path.to_a.join('_').underscore %>' do |t|
-<% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
-  t.references :patient
+create_table 'fhir.<%= el.table_name %>' do |t|
+<% el.columns.each do |col| -%>
+  t.<%= col.type %> :<%= col.name %>
 <% end -%>
-<% #TODO: back reference to parent_id %>
-<% el.elements.select_simple.each do |element| -%>
-  t.string :<%= (element.path - el.path).to_a.join('__').underscore %>
+
+<% el.references.each do |ref| -%>
+  t.references :<%= ref.name %><%- if ref.polymorphic %>, polymorphic: true <% end %>
 <% end -%>
 end
+
+<% el.references.select { |r| !r.polymorphic }.each do |ref| -%>
+add_foreign_key 'fhir.<%= el.table_name %>', 'fhir.<%= ref.table_name %>', column_name: '<%= ref.name %>_id'
+<% end %>

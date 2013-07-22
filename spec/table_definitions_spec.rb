@@ -18,6 +18,7 @@ describe Fhir::TableDefinitions do
         m.element(%w[Person contactInfo phone], type: 'string', max: '1'),
         m.element(%w[Person contactInfo mailAddress], type: nil, max: '1'),
         m.element(%w[Person contactInfo mailAddress street], type: 'string', max: '1'),
+        m.element(%w[Person contactInfo deputy], type: 'Resource(Person)', max: '1'),
 
         # Complex (embedded, plural)
         m.element(%w[Person addresses], type: nil, max: '*'),
@@ -90,6 +91,7 @@ describe Fhir::TableDefinitions do
   it 'should have singular complex attribute fields' do
     person_table_definition.should have_column 'string', 'contact_info__phone'
     person_table_definition.should have_column 'string', 'contact_info__mail_address__street'
+    person_table_definition.should have_reference 'contact_info__deputy', polymorphic: nil, table_name: 'people'
 
     person_table_definition.should have_column 'decimal', 'working_hours__low__value'
   end
@@ -111,6 +113,11 @@ describe Fhir::TableDefinitions do
     person_table_definition.should have_reference 'guarantor', polymorphic: true
     person_properties_table_definition.should have_reference 'person', polymorphic: nil
     person_properties_table_definition.should have_reference 'property', polymorphic: true
+  end
+
+  it 'should expand datatypes correctly' do
+    person_table_definition.should_not have_reference 'assigner'
+    identifiers_table_definition.should have_reference 'assigner'
   end
 
   RSpec::Matchers.define :have_reference do |name, opts = {}|

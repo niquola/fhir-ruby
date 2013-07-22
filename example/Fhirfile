@@ -23,17 +23,17 @@ generate do
   .select_branch(['MedicationStatement'])
   .apply_rules(rules)
 
+  # # models
+  # tables
+  # .template('model.rb.erb')
+  # .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
+
+  # schema
   table_definitions = resources.resource_tables
+  schema = table_definitions.template('migration.rb.erb').all.uniq.join("\n")
 
-  tables = resources.tableize
-
-  tables
-  .template('model.rb.erb')
-  .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
-
-  schema = tables.template('migration.rb.erb').all.map(&:code).uniq.join("\n")
-  schema_file_name = File.join(migrations_folder, 'schema.rb')
-  File.open(schema_file_name, 'w') { |f| f.write "execute('drop schema if exists fhir cascade; create schema fhir')\n" }
-  File.open(File.join(migrations_folder, 'schema.rb'), 'a') { |f| f.write(schema) }
-  # .file(migrations_folder){|el| el.path.to_a.join("_").underscore + '.rb'}
+  File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
+    f.write("execute('drop schema if exists fhir cascade; create schema fhir')\n")
+    f.write(schema)
+  end
 end
