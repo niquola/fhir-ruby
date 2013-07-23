@@ -2,9 +2,7 @@ create_table 'fhir.<%= el.path.to_a.join('_').underscore %>' do |t|
 <% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
   t.references :patient
 <% end -%>
-
-#TODO: back reference to parent_id
-
+<% #TODO: back reference to parent_id %>
 <% el.elements.select_simple_types.each do |element| -%>
   t.string :<%= (element.path - el.path).to_a.join('__').underscore %>
 <% end -%>
