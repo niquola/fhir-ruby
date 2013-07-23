@@ -8,5 +8,6 @@ module Fhir
   autoload :ElementsBuilder, 'fhir/elements_builder'
   autoload :Path, 'fhir/path'
   autoload :SimpleMonad, 'fhir/simple_monad'
+  autoload :Monad, 'fhir/monad'
   autoload :Element, 'fhir/element'
 end
