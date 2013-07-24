@@ -13,7 +13,7 @@ module Tableize
 
   def columns(node, selection)
     singular = node.children.select { |n| n.max == '1' }
-    singular.simple + singular.map(&:columns).flatten
+    singular + singular.map(&:columns).flatten
   end
 
   def column_name(node,_, parent)
@@ -67,6 +67,8 @@ generate do |graph|
   puts tables
   .template(path: 'migration.rb.erb')
   .render(0)
+
+  branch.branch(%w[MedicationStatement identifier]).debug
 
   # # # models
   # # tables
