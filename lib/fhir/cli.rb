@@ -7,19 +7,11 @@ module Fhir
     end
 
     def configure(&block)
-      @config = OpenStruct.new
-      block.call(@config)
+      Fhir.configure(&block)
     end
 
     def generate(&block)
-      load_meta
-      monad = Fhir::ElementsBuilder.monadic
-      monad.instance_eval(&block)
-    end
-
-    def load_meta
-      Fhir::Resource.load(@config.fhir_xml)
-      Fhir::Datatype.load(@config.datatypes_xsd)
+      Fhir.generate(&block)
     end
   end
 end

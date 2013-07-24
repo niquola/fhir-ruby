@@ -2,8 +2,9 @@ module Fhir
   class Path
     include Comparable
 
-    def initialize(array)
-      @array = array.to_a.freeze
+
+    def initialize(path)
+      @array = uniform(path).freeze
     end
 
     def inspect
@@ -23,7 +24,7 @@ module Fhir
     end
 
     def child?(subpath)
-      subpath.to_s =~ /^#{to_s}\.[^.]+$/
+      to_a == uniform(subpath)[0...-1]
     end
 
     alias :include? :subpath?
@@ -104,5 +105,20 @@ module Fhir
     end
 
     alias :eql? :==
+
+      private
+
+    def uniform(object)
+      case object
+      when Fhir::Node
+        object.path.to_a
+      when Fhir::Path
+        object.to_a
+      when Array
+        object
+      else
+        raise "Not valid path #{object}"
+      end
+    end
   end
 end

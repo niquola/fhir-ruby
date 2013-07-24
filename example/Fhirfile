@@ -1,39 +1,87 @@
 # vim:ft=ruby
+
+require File.dirname(__FILE__) + '/codegeneration/migration.rb'
+
+module Tableize
+  def class_name(node, _)
+    node.path.to_a.map(&:capitalize).join
+  end
+
+  def table_name(node, _)
+    node.class_name.tableize
+  end
+
+  def columns(node, selection)
+    singular = node.children.select { |n| n.max == '1' }
+    singular.simple + singular.map(&:columns).flatten
+  end
+
+  def column_name(node,_, parent)
+    (node.path - parent.path).to_a.map(&:underscore).join('__')
+  end
+
+  def column_type(node, _)
+    {
+      'decimal' => 'decimal',
+      'integer' => 'integer',
+      'boolean' => 'boolean',
+      'instant' => 'string',
+      'date' => 'date',
+      'base64Binary' => 'bytea',
+      'string' => 'string',
+      'uri' => 'string',
+      'dateTime' => 'datetime',
+      'id' => 'integer',
+      'code' => 'string',
+      'oid' => 'string',
+      'uuid' => 'string'
+    }[node.type] || node.type
+  end
+end
+
 configure do |cfg|
   cfg.fhir_xml = '../spec/tmp/cache.xml'
   cfg.datatypes_xsd = '../fhir-base.xsd'
+  cfg.node_modules = [Tableize]
 end
 
-generate do
+generate do |graph|
   models_folder = File.dirname(__FILE__)+ '/models/fhir'
   migrations_folder = File.dirname(__FILE__)+ '/migrations'
-  FileUtils.mkdir_p(migrations_folder)
   FileUtils.rm_rf(models_folder)
-  rules = {
-    %w[MedicationStatement dosage site coding] => {max: '1'},
-    %w[MedicationStatement dosage route coding] => {max: '1'},
-    %w[MedicationStatement dosage method coding] => {max: '1'},
-    %w[MedicationStatement identifier] => {max: '1'}
-  }
+  FileUtils.rm_rf(migrations_folder)
+  FileUtils.mkdir_p(migrations_folder)
 
-  resources = resource_elements
-  .set_simple_attribute
-  .expand_with_datatypes
-  .reject_technical_elements
-  .select_branch(['MedicationStatement'])
-  .apply_rules(rules)
+  graph.rule(%w[MedicationStatement dosage site coding],  max: '1')
+  graph.rule(%w[MedicationStatement dosage route coding], max: '1')
+  graph.rule(%w[MedicationStatement dosage method coding], max: '1')
+  graph.rule(%w[MedicationStatement identifier], max: '1')
+  graph.rule(%w[MedicationStatement reasonNotGiven coding], max: '1')
 
-  # # models
-  # tables
-  # .template('model.rb.erb')
-  # .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
+  branch = graph.selection.branch(['MedicationStatement'])
+  .reject { |node| %w[contained extension].include?(node.name) }
 
-  # schema
-  table_definitions = resources.resource_tables
-  schema = table_definitions.template('migration.rb.erb').all.uniq.join("\n")
+  tables = branch.select { |n| n.max == '*' } +
+    branch.select { |n| n.type == 'Resource' }
 
-  File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
-    f.write("execute('drop schema if exists fhir cascade; create schema fhir')\n")
-    f.write(schema)
-  end
+  puts tables
+  .template(path: 'migration.rb.erb')
+  .render(0)
+
+  # # # models
+  # # tables
+  # # .template('model.rb.erb')
+  # # .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
+
+  # # schema
+  # table_definitions = resources
+  # .tables
+  # .template(path: 'migration.rb.erb')
+
+  # schema = table_definitions.all.map(&:code).join("\n")
+
+  # File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
+  #   f<< "execute('drop schema if exists fhir cascade; create schema fhir')\n\n"
+  #   f<< schema
+  # end
 end

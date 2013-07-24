@@ -31,4 +31,10 @@ describe Fhir::Path do
     new_path.to_a.should == path.to_a
 
   end
+
+  it 'should initialize by both array and another path' do
+    path1 = Fhir::Path.new([1, 2, 3])
+    path2 = Fhir::Path.new(path1)
+    path1.should == path2
+  end
 end

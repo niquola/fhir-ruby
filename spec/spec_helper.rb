@@ -13,6 +13,11 @@ unless File.exists?(FHIR_FILE)
   end
 end
 
-Fhir::Resource.load(FHIR_FILE)
-file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
-Fhir::Datatype.load(file_name)
+DATATYPES_FILE = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
+
+Fhir.configure do |cfg|
+  cfg.selection_modules = []
+  cfg.node_modules = []
+  cfg.fhir_xml = FHIR_FILE
+  cfg.datatypes_xsd = DATATYPES_FILE
+end
