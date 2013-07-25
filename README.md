@@ -26,54 +26,46 @@ Or install it yourself as:
 
 create code-generation file with following syntax and run *fhir myfile.rb* for codegeneration
 
+
+Example:
+
 ```ruby
+generate do |graph|
+  models_folder = File.dirname(__FILE__)+ '/models/fhir'
+  migrations_folder = File.dirname(__FILE__)+ '/migrations'
+  FileUtils.rm_rf(models_folder)
+  FileUtils.rm_rf(migrations_folder)
+  FileUtils.mkdir_p(migrations_folder)
 
-rules = {
-  %w[MedicationStatement dosage site coding] => {max: '1'},
-  %w[MedicationStatement dosage route coding] => {max: '1'},
-  %w[MedicationStatement dosage method coding] => {max: '1'},
-  %w[MedicationStatement identifier] => {max: '1'}
-}
+  graph.rule(%w[MedicationStatement dosage site coding],  max: '1')
+  graph.rule(%w[MedicationStatement dosage route coding], max: '1')
+  graph.rule(%w[MedicationStatement dosage method coding], max: '1')
+  graph.rule(%w[MedicationStatement identifier], max: '1')
+  graph.rule(%w[MedicationStatement reasonNotGiven coding], max: '1')
+  graph.rule(%w[MedicationStatement medication], max: '1', embed: true)
 
-tables = resource_elements
-.expand_with_datatypes
-.filter_technical_elements
-.filter_descendants(['MedicationStatement'])
-.apply_rules(rules)
-.tableize
-.print do |el|
-  p el.elements.send(:mod).methods
-  el.elements.select_simple
-end
+  ExpandGraph.new(graph).expand
 
 
-tables.template do
-  <<-ERB
-create_table <%= el.path.to_a.join('_').underscore %> do |t|
-<% el.elements.select_simple.each do |element| -%>
-  t.string :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
-end
-  ERB
-end
-.print(&:code)
+  branch = graph.selection.branch(['MedicationStatement'])
+  .reject { |node| %w[contained extension].include?(node.name) }
 
-tables.template do
-  <<-ERB
-class <%= el.class_name %>
-<% el.elements.select_simple.each do |element| -%>
-  attr_accessor :<%= element.path.to_a.join('__').underscore %>
-<% end -%>
-<% el.elements.reject_singular.each do |element| -%>
-  has_many :<%= element.path.last.underscore.pluralize %>
-<% end -%>
+  File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
+    f.write  %Q[execute "drop schema fhir cascade; create schema fhir;"\n]
+    f.write  branch.tables
+    .template(path: "#{FHIR_PATH}/templates/migration.rb.erb")
+    .render(0)
+  end
+
+  branch
+  .models
+  .template(path: "#{FHIR_PATH}/templates/model.rb.erb")
+  .file(models_folder) {|n| "#{n.class_file_name}.rb" }
 end
-    ERB
-end
-.file(File.dirname(__FILE__)+ '/../tmp/models'){|el| el.path.to_a.join("_") + '.rb'}
-.print(&:code)
 
 ```
+
+For more details see *example_project* direcotory.
 
 ## Contributing
 
