@@ -1,4 +1,4 @@
-module SelectionQueries
+module SelectionFunctions
   def reject_idrefs(selection)
     selection.select do |n|
       n.type != 'xmlIdRef'

@@ -1,4 +1,4 @@
-module Tableize
+module NodeFunctions
   def class_name(node, _)
     node.path.to_a.map(&:camelize).join
   end

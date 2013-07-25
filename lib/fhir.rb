@@ -1,4 +1,5 @@
-$:.unshift(File.dirname(__FILE__)) unless $:.include?(File.dirname(__FILE__))
+$:.unshift(File.expand_path(File.dirname(__FILE__))) unless $:.include?(File.dirname(__FILE__))
+
 require 'ostruct'
 require 'active_support/core_ext'
 

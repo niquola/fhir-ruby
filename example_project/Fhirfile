@@ -9,8 +9,8 @@ require FHIR_PATH + '/gen/selection_functions.rb'
 configure do |cfg|
   cfg.fhir_xml = FHIR_PATH + '/../spec/tmp/cache.xml'
   cfg.datatypes_xsd = FHIR_PATH + '/../fhir-base.xsd'
-  cfg.node_modules = [Tableize]
-  cfg.selection_modules = [SelectionQueries]
+  cfg.node_modules = [NodeFunctions]
+  cfg.selection_modules = [SelectionFunctions]
 end
 
 class ExpandGraph

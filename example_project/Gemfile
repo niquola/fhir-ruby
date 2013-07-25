@@ -1,8 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'fhir', path: File.expand_path('../../',__FILE__)
-
-p Fhir::VERSION
 gem 'rspec'
 gem 'nokogiri'
 gem 'active_support'
