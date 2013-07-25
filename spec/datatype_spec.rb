@@ -15,12 +15,6 @@ describe Fhir::Datatype do
     Fhir::Datatype.find('Address').should be_complex
   end
 
-  it 'should' do
-    p Fhir::Datatype.find('Identifier').attributes.each do |a|
-      puts a.name
-    end
-  end
-
   it 'should parse attributes' do
     Fhir::Datatype.all.each do |datatype|
       puts datatype.name
