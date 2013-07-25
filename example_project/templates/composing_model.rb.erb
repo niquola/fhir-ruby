@@ -3,7 +3,7 @@ class <%= node.class_name %>
   include Fhir::Composing
 <%= node
 .embeded_children
-.template(path: "#{FHIR_PATH}/composing_model.rb.erb")
+.template(path: "#{FHIR_PATH}/templates/composing_model.rb.erb")
 .render(1) %>
 <%- node.columns.each do |column| -%>
   composing_attribute :<%= column.column_name(node) %>

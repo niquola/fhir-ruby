@@ -18,6 +18,6 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 include Fhir::Composite
 <%= node
 .embeded_children
-.template(path: "#{::FHIR_PATH}/composing_model.rb.erb")
+.template(path: "#{::FHIR_PATH}/templates/composing_model.rb.erb")
 .render(1) %>
 end

@@ -1,8 +1,8 @@
 # vim:ft=ruby
 
 ::FHIR_PATH = File.expand_path(File.dirname(__FILE__))
-require FHIR_PATH + '/codegeneration/node_functions.rb'
-require FHIR_PATH + '/codegeneration/selection_functions.rb'
+require FHIR_PATH + '/gen/node_functions.rb'
+require FHIR_PATH + '/gen/selection_functions.rb'
 
 
 
@@ -52,12 +52,12 @@ generate do |graph|
   File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
     f.write  %Q[execute "drop schema fhir cascade; create schema fhir;"\n]
     f.write  branch.tables
-    .template(path: "#{FHIR_PATH}/migration.rb.erb")
+    .template(path: "#{FHIR_PATH}/templates/migration.rb.erb")
     .render(0)
   end
 
   branch
   .models
-  .template(path: "#{FHIR_PATH}/model.rb.erb")
+  .template(path: "#{FHIR_PATH}/templates/model.rb.erb")
   .file(models_folder) {|n| "#{n.class_file_name}.rb" }
 end

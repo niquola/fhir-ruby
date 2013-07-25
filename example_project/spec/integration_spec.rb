@@ -1,10 +1,4 @@
-require 'active_support'
-require 'active_support/core_ext'
-require 'active_record'
-require 'active_support/dependencies'
-
-ActiveSupport::Dependencies.autoload_paths << File.expand_path('../models', __FILE__)
-ActiveSupport::Dependencies.autoload_paths << File.expand_path('../lib', __FILE__)
+require 'spec_helper'
 
 ActiveRecord::Base.establish_connection(
   adapter: 'postgresql',
@@ -15,7 +9,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 ActiveRecord::Schema.define do
-  eval File.read(File.dirname(__FILE__) + '/migrations/schema.rb')
+  eval File.read(File.dirname(__FILE__) + '/../migrations/schema.rb')
 end
 
 codings_attributes = [
