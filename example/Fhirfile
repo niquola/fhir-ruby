@@ -1,48 +1,32 @@
 # vim:ft=ruby
 
-require File.dirname(__FILE__) + '/codegeneration/migration.rb'
+::FHIR_PATH = File.expand_path(File.dirname(__FILE__))
+require FHIR_PATH + '/codegeneration/node_functions.rb'
+require FHIR_PATH + '/codegeneration/selection_functions.rb'
 
-module Tableize
-  def class_name(node, _)
-    node.path.to_a.map(&:capitalize).join
-  end
 
-  def table_name(node, _)
-    node.path.to_a.map(&:underscore).join('_').tableize
-  end
-
-  def columns(node, selection)
-    singular = node.children.select { |n| n.max == '1' }
-    singular.simple + singular.map(&:columns).flatten
-  end
-
-  def column_name(node,_, parent)
-    (node.path - parent.path).to_a.map(&:underscore).join('__')
-  end
-
-  def column_type(node, _)
-    {
-      'decimal' => 'decimal',
-      'integer' => 'integer',
-      'boolean' => 'boolean',
-      'instant' => 'string',
-      'date' => 'date',
-      'base64Binary' => 'bytea',
-      'string' => 'string',
-      'uri' => 'string',
-      'dateTime' => 'datetime',
-      'id' => 'integer',
-      'code' => 'string',
-      'oid' => 'string',
-      'uuid' => 'string'
-    }[node.type] || node.type
-  end
-end
 
 configure do |cfg|
-  cfg.fhir_xml = '../spec/tmp/cache.xml'
-  cfg.datatypes_xsd = '../fhir-base.xsd'
+  cfg.fhir_xml = FHIR_PATH + '/../spec/tmp/cache.xml'
+  cfg.datatypes_xsd = FHIR_PATH + '/../fhir-base.xsd'
   cfg.node_modules = [Tableize]
+  cfg.selection_modules = [SelectionQueries]
+end
+
+class ExpandGraph
+  def initialize(graph)
+    @graph = graph
+  end
+
+  def expand
+    @graph.selection.by_attr(:embed, true).each do |node|
+      res = node.referenced_resource
+      res.descendants.each do |dsc|
+        path = node.path.to_a + dsc.path.to_a[1..-1]
+        @graph.add(path, dsc.attributes) unless @graph.path_exists?(path)
+      end
+    end
+  end
 end
 
 generate do |graph|
@@ -57,31 +41,23 @@ generate do |graph|
   graph.rule(%w[MedicationStatement dosage method coding], max: '1')
   graph.rule(%w[MedicationStatement identifier], max: '1')
   graph.rule(%w[MedicationStatement reasonNotGiven coding], max: '1')
+  graph.rule(%w[MedicationStatement medication], max: '1', embed: true)
+
+  ExpandGraph.new(graph).expand
+
 
   branch = graph.selection.branch(['MedicationStatement'])
   .reject { |node| %w[contained extension].include?(node.name) }
 
-  tables = branch.select { |n| n.max == '*' } +
-    branch.select { |n| n.type == 'Resource' }
+  File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
+    f.write  %Q[execute "drop schema fhir cascade; create schema fhir;"\n]
+    f.write  branch.tables
+    .template(path: "#{FHIR_PATH}/migration.rb.erb")
+    .render(0)
+  end
 
-  puts tables
-  .template(path: 'migration.rb.erb')
-  .render(0)
-
-  # # # models
-  # # tables
-  # # .template('model.rb.erb')
-  # # .file(models_folder) { |el| el.path.to_a.join("_").underscore + '.rb' }
-
-  # # schema
-  # table_definitions = resources
-  # .tables
-  # .template(path: 'migration.rb.erb')
-
-  # schema = table_definitions.all.map(&:code).join("\n")
-
-  # File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|
-  #   f<< "execute('drop schema if exists fhir cascade; create schema fhir')\n\n"
-  #   f<< schema
-  # end
+  branch
+  .models
+  .template(path: "#{FHIR_PATH}/model.rb.erb")
+  .file(models_folder) {|n| "#{n.class_file_name}.rb" }
 end

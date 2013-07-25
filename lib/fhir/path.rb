@@ -20,7 +20,8 @@ module Fhir
     end
 
     def subpath?(subpath)
-      subpath.to_s.start_with?(self.to_s) && subpath.size > self.size
+      subpath = uniform(subpath)
+      self_or_subpath?(subpath) && subpath.size > self.size
     end
 
     def child?(subpath)
@@ -30,7 +31,7 @@ module Fhir
     alias :include? :subpath?
 
     def self_or_subpath?(subpath)
-      subpath.to_s =~ /^#{self.to_s}/
+      uniform(subpath).to_a[0...self.to_a.length] == self.to_a
     end
 
     def [](range_or_index)

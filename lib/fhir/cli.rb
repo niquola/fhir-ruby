@@ -2,8 +2,9 @@ require 'ostruct'
 
 module Fhir
   class Cli
-    def initialize
-      self.instance_eval File.read('Fhirfile'), 'Fhirfile'
+    def initialize(file)
+      raise "Could not find configuratin file - #{file}" unless File.exists?(file)
+      self.instance_eval File.read(file), file
     end
 
     def configure(&block)

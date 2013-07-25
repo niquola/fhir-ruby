@@ -2,4 +2,5 @@
 
 require 'fhir'
 
-cli = Fhir::Cli.new
+file = ARGV.first || 'Fhirfile'
+cli = Fhir::Cli.new(file)

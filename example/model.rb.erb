@@ -1,27 +1,23 @@
-class <%= el.class_name %> < Fhir::Base
-<% if patient = el.elements.select{|e| e.type == 'Resource(Patient)'}.all.first -%>
-  # <%= patient.attributes[:comment] %>
-  belongs_to :patient
+class Fhir::<%= node.class_name %> < Fhir::Base
+<% node.references.each do |ref| %>
+  belongs_to :<%= ref.name.underscore %>,
+    class_name: '<%= ref.class_name %>'
 <% end -%>
 
-<% el.elements.select_children(el).select_simple.each do |element| -%>
-  # <%= element.attributes[:comment] %>
-  # @attribute: <%= element.path.last.underscore %>
-<% end -%>
-<% el.elements.reject_singular.each do |element| -%>
+<% node.associations.each do |ref| %>
+  has_many :<%= ref.column_name(node).pluralize %>,
+    class_name: '<%= ref.class_name %>'
 
-  # <%= element.attributes[:comment] %>
-  has_many :<%= element.path.last.underscore.pluralize %>,
-    class_name: '<%= element.class_name %>'
+  accepts_nested_attributes_for :<%= ref.column_name(node).pluralize %>
 <% end -%>
 
-<%= el.elements
-.select_alone_descendants(el)
-.select_children(el)
-.reject_simple
-.select_singular
-.reject_resources
-.template('composing_model.rb.erb')
-.render
-.all %>
+<% node.model_attributes.each do |column| -%>
+  # @attribute: <%= column.column_name(node) %> <%= column.column_type %>
+<% end -%>
+
+include Fhir::Composite
+<%= node
+.embeded_children
+.template(path: "#{::FHIR_PATH}/composing_model.rb.erb")
+.render(1) %>
 end

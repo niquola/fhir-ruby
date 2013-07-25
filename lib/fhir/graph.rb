@@ -14,6 +14,10 @@ module Fhir
       @nodes ||= []
     end
 
+    def path_exists?(path)
+      @index.key?(path.to_s)
+    end
+
     def add(path, attrs = {})
       raise "Duplicate node #{path} in graph" if @index.key?(path.to_s)
       @index[path.to_s] = true

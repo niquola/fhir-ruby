@@ -1,15 +1,16 @@
-class <%= el.class_name %>
+class <%= node.class_name %>
+  include Fhir::Composite
   include Fhir::Composing
-<% el.elements.select_children(el).select_simple.each do |element| -%>
-  composing_attribute :<%= element.path.last.underscore %>
-<% end -%>
-<%= el.elements
-.select_alone_descendants(el)
-.select_children(el)
-.reject_simple
-.select_singular
-.reject_resources
-.template('composing_model.rb.erb')
-.render
-.all %>
+<%= node
+.embeded_children
+.template(path: "#{FHIR_PATH}/composing_model.rb.erb")
+.render(1) %>
+<%- node.columns.each do |column| -%>
+  composing_attribute :<%= column.column_name(node) %>
+<%- end -%>
+<%- node.embeded_associations.each do |column| -%>
+  composing_attribute :<%= column.column_name(node).pluralize %>_attributes
+  composing_attribute :<%= column.column_name(node).pluralize %>
+<%- end -%>
 end
+composing :<%= node.name %>, class_name: '<%= node.class_name %>'

@@ -28,6 +28,22 @@ module Fhir
       end
     end
 
+    def complex(selection)
+      selection.select do |node|
+        not node.children.to_a.empty?
+      end
+    end
+
+    def by_attr(selection, name, val)
+      selection.select do |node|
+        if node.respond_to?(name)
+          node.send(name) == val
+        else
+          node.attributes[name] == val
+        end
+      end
+    end
+
     def parents(selection)
       selection.map(&:parent)
     end
