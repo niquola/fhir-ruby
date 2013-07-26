@@ -15,9 +15,9 @@ class Fhir::<%= node.class_name %> < Fhir::Base
   # @attribute: <%= column.column_name(node) %> <%= column.column_type %>
 <% end -%>
 
-include Fhir::Composite
+  include Fhir::Composite
 <%= node
-.embeded_children
+.embedded_children
 .template(path: "#{::FHIR_PATH}/templates/composing_model.rb.erb")
 .render(1) %>
 end

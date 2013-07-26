@@ -39,7 +39,7 @@ describe Fhir::Datatype do
   end
 
   it 'should do something' do
-    file_name = File.join(File.dirname(__FILE__), '..', '..', 'fhir-base.xsd')
+    file_name = File.join(File.dirname(__FILE__), '..', 'fhir-base.xsd')
     document = Nokogiri::XML(File.open(file_name).readlines.join)
     document.remove_namespaces!
 

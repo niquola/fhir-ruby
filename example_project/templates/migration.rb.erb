@@ -1,4 +1,7 @@
 create_table 'fhir.<%= node.table_name %>' do |t|
+<% if node.parent -%>
+t.belongs_to :<%= node.parent.class_name.underscore %>
+<% end -%>
 <%- node.references.each do |column| -%>
   t.belongs_to :<%= column.column_name(node) %>
 <% end -%>

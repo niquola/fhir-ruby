@@ -15,12 +15,12 @@ module NodeFunctions
     node.children.resorce_refs.by_attr(:embed, nil)
   end
 
-  def embeded_associations(node, selection)
+  def embedded_associations(node, selection)
     node
     .children
     .reject_contained
     .complex
-    .by_attr('max','*')
+    .by_attr('max', '*')
   end
 
   def associations(node, selection)
@@ -28,13 +28,13 @@ module NodeFunctions
     .children
     .reject_contained
     .complex
-    .by_attr('max','*')
+    .by_attr('max', '*')
 
     nodes + node.children.map(&:associations).flatten
   end
 
   def resource_name(node, _)
-    node.type.gsub(/^Resource\(/,'').gsub(/\)/,'')
+    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '')
   end
 
   def referenced_resource(node, selection)
@@ -50,8 +50,8 @@ module NodeFunctions
     node.children.by_attr('max', '1').simple.simple_types.reject_idrefs
   end
 
-  def embeded_children(node, selection)
-    node.children.complex.by_attr('max','1')
+  def embedded_children(node, selection)
+    node.children.complex.by_attr('max', '1')
   end
 
   def column_name(node,_, parent)

@@ -19,7 +19,7 @@ describe NodeFunctions do
     route.table_name.should == 'medication_statement_dosage_routes'
   end
 
-  it 'table_name' do
+  it 'class_file_name' do
     route.class_file_name.should == 'medication_statement_dosage_route'
   end
 
@@ -31,7 +31,15 @@ describe NodeFunctions do
     .should =~ ["administrationDevice", "medication", "patient"]
   end
 
-  it 'embeded_associations' do
-    medstatment.embeded_associations.debug
+  it 'embedded_associations' do
+    medstatment
+    .embedded_associations
+    .to_a
+    .map(&:name)
+    .should =~ %w[identifier dosage reasonNotGiven]
+  end
+
+  it 'associations' do
+    medstatment.associations.debug
   end
 end

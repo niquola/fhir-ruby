@@ -4,9 +4,10 @@ describe "Generated code" do
   example do
     ActiveRecord::Base.establish_connection(
       adapter: 'postgresql',
-      host: '/home/nicola/pg/',
-      port: 5555,
-      username: 'nicola',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'postgres',
       database: 'fhir'
     )
 
