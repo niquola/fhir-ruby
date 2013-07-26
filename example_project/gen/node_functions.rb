@@ -54,7 +54,7 @@ module NodeFunctions
     node.children.complex.by_attr('max', '1')
   end
 
-  def column_name(node,_, parent)
+  def column_name(node, _, parent)
     postfix = {
       'system' => '_name'
     }[node.name] || ''
