@@ -1,6 +1,6 @@
 class Fhir::<%= node.class_name %> < Fhir::Base
 <% node.references.each do |ref| %>
-  belongs_to :<%= ref.referenced_resource.name.underscore %>,
+  belongs_to :<%= ref.class_name.underscore %>,
     class_name: '<%= ref.class_name %>'
 <% end -%>
 

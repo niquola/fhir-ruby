@@ -48,8 +48,8 @@ module NodeFunctions
     nodes + node.children.map(&:associations).flatten
   end
 
-  def resource_names(node, _)
-    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '').split('|')
+  def resource_name(node, _)
+    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '')
   end
 
   def referenced_resource(node, selection)

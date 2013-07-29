@@ -32,7 +32,7 @@ describe NodeFunctions do
     .references
     .to_a
     .map(&:name)
-    .should =~ ["administrationDevice", "medication", "patient"]
+    .should =~ ["administrationDevice", "patient"]
   end
 
   example 'embedded_associations' do
@@ -40,21 +40,18 @@ describe NodeFunctions do
     .embedded_associations
     .to_a
     .map(&:name)
-    .should =~ %w[identifier dosage reasonNotGiven]
+    .should =~ %w[dosage reasonNotGiven]
   end
 
   example 'associations' do
     medstatement
     .associations
     .to_a
-    .tap { |a| a.size.should == 8 }
-    .map(&:max)
-    .uniq
-    .should == ['*']
+    .map(&:name).should =~ ["dosage", "event", "reasonNotGiven"]
   end
 
   example 'resource name' do
-    medstatement_patient.resource_names.should == ['Patient']
+    medstatement_patient.resource_name.should == 'Patient'
   end
 
   example 'referenced resource' do
@@ -65,8 +62,19 @@ describe NodeFunctions do
     medstatement
     .columns
     .to_a
-    .map(&:column_name)
-    .should =~ %w[language wasNotGiven start end]
+    .map{|n| n.column_name(medstatement)}
+    .should =~ ["identifier__assigner__display",
+		"identifier__assigner__reference",
+		"identifier__assigner__type",
+		"identifier__key",
+		"identifier__label",
+		"identifier__period__end",
+		"identifier__period__start",
+		"identifier__system_name",
+		"language",
+		"was_not_given",
+		"when_given__end",
+		"when_given__start"]
   end
 
   example 'model attributes' do
