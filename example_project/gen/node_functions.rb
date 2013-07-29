@@ -12,7 +12,10 @@ module NodeFunctions
   end
 
   def references(node, selection)
-    node.children.resource_refs.by_attr(:embed, nil)
+    node.children
+    .reject_contained
+    .resource_refs
+    .by_attr(:embed, nil)
   end
 
   def resource_ref?(node, _)
@@ -45,8 +48,8 @@ module NodeFunctions
     nodes + node.children.map(&:associations).flatten
   end
 
-  def resource_name(node, _)
-    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '')
+  def resource_names(node, _)
+    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '').split('|')
   end
 
   def referenced_resource(node, selection)

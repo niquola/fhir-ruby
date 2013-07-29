@@ -1,6 +1,6 @@
 class Fhir::<%= node.class_name %> < Fhir::Base
 <% node.references.each do |ref| %>
-  belongs_to :<%= ref.name.underscore %>,
+  belongs_to :<%= ref.referenced_resource.name.underscore %>,
     class_name: '<%= ref.class_name %>'
 <% end -%>
 
@@ -16,8 +16,8 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 <% end -%>
 
   include Fhir::Composite
-<% node.embedded_children.each do |emb| %>
-composing :<%= emb.name %>, class_name: '<%= emb.class_name %>'
+<% node.embedded_children.each do |emb| -%>
+  composing :<%= emb.name %>,
+    class_name: '<%= emb.class_name %>'
 <% end -%>
-
 end

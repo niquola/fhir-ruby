@@ -54,7 +54,7 @@ describe NodeFunctions do
   end
 
   example 'resource name' do
-    medstatement_patient.resource_name.should == 'Patient'
+    medstatement_patient.resource_names.should == ['Patient']
   end
 
   example 'referenced resource' do
@@ -65,7 +65,7 @@ describe NodeFunctions do
     medstatement
     .columns
     .to_a
-    .map(&:name)
+    .map(&:column_name)
     .should =~ %w[language wasNotGiven start end]
   end
 
@@ -82,7 +82,7 @@ describe NodeFunctions do
     .embedded_children
     .to_a
     .map(&:name)
-    .should =~ %w[whenGiven]
+    .should =~ %w[whenGiven identifier]
   end
 
   example 'column name' do

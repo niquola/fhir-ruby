@@ -1,3 +1,4 @@
 adapter: postgresql
-port: 5432
+host: /home/nicola/pg
+port: 5555
 database: fhir
