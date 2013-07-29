@@ -15,7 +15,7 @@ describe 'Condition' do
     }
 
     evidence = Fhir::ConditionEvidence.new(code_attributes: codeable_concept_attributes)
-    location = Fhir::ConditionLocation.new(code_attributes: codeable_concept_attributes)
+    location = Fhir::ConditionLocation.new(detail: 'detail', code_attributes: codeable_concept_attributes)
     related_item = Fhir::ConditionRelatedItem.new(type: 'follows', code_attributes: codeable_concept_attributes)
 
     condition = Fhir::Condition.create!(
@@ -37,8 +37,21 @@ describe 'Condition' do
     condition.locations << locations
     condition.related_items << related_item
 
+    condition.date_asserted.should be_within(10.seconds).of(Time.zone.now)
+    condition.code.text.should == 'code text'
+    condition.category.text.should 'code text'
     condition.status.should == 'working'
-    condition.locations.first.code.text.should == 'code text'
+    condition.certainty.text.should == 'code text'
+    condition.severity.text.should == 'code text'
+    condition.onset.should be_within(10.seconds).of(Time.zone.now)
+    condition.abatement.should be_false
     condition.stage.summary.text.should == 'code text'
+    condition.notes.should == 'notes'
+
+    condition.evidences.first.code.text.should == 'code text'
+    condition.locations.first.code.text.should == 'code text'
+    condition.locations.first.detail.should == 'detail'
+    condition.related_items.first.code.text.should == 'code text'
+    condition.related_items.first.type.should == 'follows'
   end
 end

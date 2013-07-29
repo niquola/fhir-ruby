@@ -19,6 +19,7 @@ describe 'Condition' do
 
     allergy.criticality.should == 'fatal'
     allergy.sensitivity_type.should == 'type'
+    allergy.recorded_date.should be_within(10.seconds).of(Time.zone.now)
     allergy.status.should == 'status'
   end
 end
