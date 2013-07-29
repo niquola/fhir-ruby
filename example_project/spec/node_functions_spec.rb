@@ -89,8 +89,13 @@ describe NodeFunctions do
     when_given_start.column_name(medstatement).should == 'when_given__start'
   end
 
+  example 'resource_ref?' do
+    medication.resource_ref?.should be_false
+    medstatement_patient.resource_ref?.should be_true
+  end
+
   example 'has_identity?' do
-    medication.has_identity?.should == false
-    medstatement.has_identity?.should == true
+    medication.has_identity?.should be_false
+    medstatement.has_identity?.should be_true
   end
 end
