@@ -18,6 +18,6 @@ class Fhir::<%= node.class_name %> < Fhir::Base
   include Fhir::Composite
 <% node.embedded_children.each do |emb| -%>
   composing :<%= emb.name %>,
-    class_name: '<%= emb.class_name %>'
+    class_name: 'Fhir::<%= emb.class_name %>'
 <% end -%>
 end
