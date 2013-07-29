@@ -4,6 +4,7 @@ describe NodeFunctions do
   let(:selection) { Fhir.graph.selection }
 
   let(:medstatement) { selection.node(['MedicationStatement']) }
+  let(:medication) { selection.node(['Medication']) }
   let(:dose) { selection.node(['MedicationStatement','dosage']) }
   let(:route) { selection.node(['MedicationStatement','dosage', 'route']) }
   let(:medstatement_patient) { selection.node(['MedicationStatement', 'patient']) }
@@ -86,5 +87,10 @@ describe NodeFunctions do
 
   example 'column name' do
     when_given_start.column_name(medstatement).should == 'when_given__start'
+  end
+
+  example 'has_identity?' do
+    medication.has_identity?.should == false
+    medstatement.has_identity?.should == true
   end
 end

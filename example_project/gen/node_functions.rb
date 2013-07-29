@@ -7,12 +7,24 @@ module NodeFunctions
     node.path.to_a.map(&:underscore).join('_').tableize
   end
 
-  def class_file_name(node,_)
+  def class_file_name(node, _)
     node.class_name.underscore
   end
 
   def references(node, selection)
-    node.children.resorce_refs.by_attr(:embed, nil)
+    node.children.resource_refs.by_attr(:embed, nil)
+  end
+
+  def resource_ref?(node, _)
+    node.path.size > 1 &&
+      node.type =~ /^Resource/ &&
+      !node.attributes[:embed]
+  end
+
+  def has_identity?(node, _)
+    node.children.to_a.any? do |child|
+      child.name == 'identifier'
+    end
   end
 
   def embedded_associations(node, selection)
