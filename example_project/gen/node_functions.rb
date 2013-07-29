@@ -61,7 +61,7 @@ module NodeFunctions
   end
 
   def referenced_resource(node, selection)
-    selection.node([node.resource_name])
+    selection.node([node.resource_names.first])
   end
 
   def columns(node, selection)

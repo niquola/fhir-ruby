@@ -19,3 +19,4 @@ tmp
 *~
 example_project/models
 example_project/migrations
+example_project/spec/database.yml
