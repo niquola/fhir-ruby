@@ -31,16 +31,14 @@ module SelectionFunctions
   end
 
   def tables(selection)
-    (selection.select { |n| n.max == '*' } + selection.select { |n| n.type == 'Resource' }).sorted
+    (selection.by_attr('type', 'Resource') + selection.by_attr('max', '*')).sorted
   end
 
   def models(selection)
     selection.tables
   end
 
-  def resorce_refs(selection)
-    selection.select do |n|
-      n.type =~ /^Resource\(/
-    end
+  def resource_refs(selection)
+    selection.select(&:resource_ref?)
   end
 end

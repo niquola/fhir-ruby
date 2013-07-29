@@ -12,7 +12,7 @@ configure do |cfg|
   cfg.fhir_xml = FHIR_PATH + '/../spec/tmp/cache.xml'
   cfg.datatypes_xsd = FHIR_PATH + '/../fhir-base.xsd'
   cfg.node_modules = [::NodeFunctions]
-  cfg.selection_modules = [SelectionFunctions]
+  cfg.selection_modules = [::SelectionFunctions]
 end
 
 generate do |graph|
