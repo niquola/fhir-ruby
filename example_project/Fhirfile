@@ -3,6 +3,8 @@
 ::FHIR_PATH = File.expand_path(File.dirname(__FILE__))
 require FHIR_PATH + '/gen/node_functions.rb'
 require FHIR_PATH + '/gen/selection_functions.rb'
+require FHIR_PATH + '/gen/expand_graph.rb'
+require FHIR_PATH + '/gen/rules.rb'
 
 
 
@@ -13,22 +15,6 @@ configure do |cfg|
   cfg.selection_modules = [SelectionFunctions]
 end
 
-class ExpandGraph
-  def initialize(graph)
-    @graph = graph
-  end
-
-  def expand
-    @graph.selection.by_attr(:embed, true).each do |node|
-      res = node.referenced_resource
-      res.descendants.each do |dsc|
-        path = node.path.to_a + dsc.path.to_a[1..-1]
-        @graph.add(path, dsc.attributes) unless @graph.path_exists?(path)
-      end
-    end
-  end
-end
-
 generate do |graph|
   models_folder = File.dirname(__FILE__)+ '/models/fhir'
   migrations_folder = File.dirname(__FILE__)+ '/migrations'
@@ -36,13 +22,7 @@ generate do |graph|
   FileUtils.rm_rf(migrations_folder)
   FileUtils.mkdir_p(migrations_folder)
 
-  graph.rule(%w[MedicationStatement dosage site coding],  max: '1')
-  graph.rule(%w[MedicationStatement dosage route coding], max: '1')
-  graph.rule(%w[MedicationStatement dosage method coding], max: '1')
-  graph.rule(%w[MedicationStatement identifier], max: '1')
-  graph.rule(%w[MedicationStatement reasonNotGiven coding], max: '1')
-  graph.rule(%w[MedicationStatement medication], max: '1', embed: true)
-
+  Rules.apply(graph)
   ExpandGraph.new(graph).expand
 
 
@@ -59,5 +39,10 @@ generate do |graph|
   branch
   .models
   .template(path: "#{FHIR_PATH}/templates/model.rb.erb")
+  .file(models_folder) {|n| "#{n.class_file_name}.rb" }
+
+  branch
+  .value_objects
+  .template(path: "#{::FHIR_PATH}/templates/composing_model.rb.erb")
   .file(models_folder) {|n| "#{n.class_file_name}.rb" }
 end

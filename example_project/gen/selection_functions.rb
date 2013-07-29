@@ -17,6 +17,15 @@ module SelectionFunctions
     end
   end
 
+  def value_objects(selection)
+    selection
+    .reject_contained
+    .complex
+    .select do |n|
+      n.type != 'Resource'
+    end.by_attr('max', '1')
+  end
+
   def sorted(selection)
     selection.sort_by(&:path)
   end

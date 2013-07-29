@@ -1,15 +1,8 @@
 require 'spec_helper'
-
+FHIR_SPEC_ROOT = File.dirname(__FILE__)
 describe "Generated code" do
   example do
-    ActiveRecord::Base.establish_connection(
-      adapter: 'postgresql',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'fhir'
-    )
+    ActiveRecord::Base.establish_connection(YAML.load_file( FHIR_SPEC_ROOT + '/database.yml'))
 
     ActiveRecord::Schema.define do
       eval File.read(File.dirname(__FILE__) + '/../migrations/schema.rb')
@@ -17,28 +10,28 @@ describe "Generated code" do
 
     codings_attributes = [
       {
-        system_name: 'rxnorm.info',
-        code: '312961'
+	system_name: 'rxnorm.info',
+	code: '312961'
       },
       {
-        system_name: 'ndc',
-        code: '52959-989'
+	system_name: 'ndc',
+	code: '52959-989'
       }
     ]
 
     medication_attributes =  {
       name: 'Simvastatin 20 mg tablet',
       code_attributes: {
-        text: 'Simvastatin 20 mg tablet',
-        codings_attributes: codings_attributes
+	text: 'Simvastatin 20 mg tablet',
+	codings_attributes: codings_attributes
       }
     }
 
     identifier_attributes = {
       key: '321312',
       assigner_attributes: {
-        type: 'hospital rx',
-        display: 'Apteka'
+	type: 'hospital rx',
+	display: 'Apteka'
       }
     }
 

@@ -19,3 +19,6 @@ Fhir.configure do |cfg|
   cfg.node_modules = [NodeFunctions]
   cfg.selection_modules = [SelectionFunctions]
 end
+
+ExpandGraph.new(Fhir.graph).expand
+Rules.apply(Fhir.graph)

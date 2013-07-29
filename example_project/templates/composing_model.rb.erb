@@ -1,10 +1,10 @@
-class <%= node.class_name %>
+class Fhir::<%= node.class_name %>
   include Fhir::Composite
   include Fhir::Composing
-<%= node
-.embedded_children
-.template(path: "#{FHIR_PATH}/templates/composing_model.rb.erb")
-.render(1) %>
+<% node.embedded_children.each do |emb| %>
+  composing :<%= emb.name %>,
+    class_name: '<%= emb.class_name %>'
+<% end -%>
 <%- node.columns.each do |column| -%>
   composing_attribute :<%= column.column_name(node) %>
 <%- end -%>
@@ -13,4 +13,3 @@ class <%= node.class_name %>
   composing_attribute :<%= column.column_name(node).pluralize %>
 <%- end -%>
 end
-composing :<%= node.name %>, class_name: '<%= node.class_name %>'
