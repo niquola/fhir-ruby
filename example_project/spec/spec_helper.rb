@@ -1,3 +1,4 @@
+# system  "bundle exec ../bin/fhir Fhirfile"
 require 'active_support'
 require 'active_record'
 require 'active_support/core_ext'
@@ -20,5 +21,5 @@ Fhir.configure do |cfg|
   cfg.selection_modules = [SelectionFunctions]
 end
 
-ExpandGraph.new(Fhir.graph).expand
 Rules.apply(Fhir.graph)
+ExpandGraph.new(Fhir.graph).expand

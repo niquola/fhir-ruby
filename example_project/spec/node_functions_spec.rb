@@ -11,10 +11,17 @@ describe NodeFunctions do
   let(:patient) { selection.node(['Patient']) }
   let(:when_given_start) { selection.node(['MedicationStatement', 'whenGiven', 'start']) }
 
+
   example 'class_name' do
     medstatement.class_name.should == 'MedicationStatement'
     dose.class_name.should == 'MedicationStatementDosage'
     route.class_name.should == 'MedicationStatementDosageRoute'
+  end
+
+  example 'belongs_to' do
+    selection
+    .node(['MedicationStatement', 'medication', 'code', 'coding'])
+    .belongs_to
   end
 
   example 'table_name' do

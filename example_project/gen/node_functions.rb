@@ -18,6 +18,14 @@ module NodeFunctions
     .by_attr(:embed, nil)
   end
 
+  def belongs_to(node, selection)
+    node.ancestors.to_a.sort_by { |n|
+      n.path.length
+    }.reverse.find do |n|
+      n.max == '*' or n.type == 'Resource'
+    end
+  end
+
   def resource_ref?(node, _)
     node.path.size > 1 &&
       node.type =~ /^Resource/ &&
