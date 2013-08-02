@@ -54,7 +54,7 @@ describe NodeFunctions do
     medstatement
     .associations
     .to_a
-    .map(&:name).should =~ ["dosage", "event", "reasonNotGiven"]
+    .map(&:table_name).should =~ ["dosage", "event", "reasonNotGiven"]
   end
 
   example 'resource name' do
@@ -81,7 +81,14 @@ describe NodeFunctions do
 		"language",
 		"was_not_given",
 		"when_given__end",
-		"when_given__start"]
+		"when_given__start",
+		"medication__code__text",
+		"medication__is_brand",
+		"medication__kind",
+		"medication__language",
+		"medication__name",
+		"medication__package__container__text",
+		"medication__product__form__text"]
   end
 
   example 'model attributes' do
@@ -97,7 +104,7 @@ describe NodeFunctions do
     .embedded_children
     .to_a
     .map(&:name)
-    .should =~ %w[whenGiven identifier]
+    .should =~ %w[whenGiven identifier medication]
   end
 
   example 'column name' do

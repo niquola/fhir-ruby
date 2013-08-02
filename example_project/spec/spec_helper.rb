@@ -1,4 +1,4 @@
-system  "bundle exec ../bin/fhir Fhirfile"
+system  "bundle exec ../bin/fhir Fhirfile" unless ENV['NOGEN']
 require 'active_support'
 require 'active_record'
 require 'active_support/core_ext'
