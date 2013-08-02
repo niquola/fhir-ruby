@@ -56,8 +56,8 @@ module NodeFunctions
     nodes + node.children.map(&:associations).flatten
   end
 
-  def resource_names(node, _)
-    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '').split('|')
+  def resource_name(node, _)
+    node.type.gsub(/^Resource\(/, '').gsub(/\)/, '')
   end
 
   def referenced_resource(node, selection)
@@ -79,9 +79,13 @@ module NodeFunctions
 
   def column_name(node, _, parent)
     postfix = {
-      'system' => '_name'
+      'system' => '_name',
+      'type' => '_name'
     }[node.name] || ''
-    (node.path - parent.path).to_a.map(&:underscore).join('__') + postfix
+
+    (node.path - parent.path)
+    .to_a.map(&:underscore)
+    .join('__').gsub('[x]','') + postfix
   end
 
   def column_type(node, _)

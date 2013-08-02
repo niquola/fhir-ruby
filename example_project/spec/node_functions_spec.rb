@@ -54,7 +54,14 @@ describe NodeFunctions do
     medstatement
     .associations
     .to_a
-    .map(&:table_name).should =~ ["dosage", "event", "reasonNotGiven"]
+    .map(&:table_name).should =~ ["medication_statement_dosage_timing_events",
+				  "medication_statement_dosages",
+				  "medication_statement_medication_code_codings",
+				  "medication_statement_medication_package_container_codings",
+				  "medication_statement_medication_package_contents",
+				  "medication_statement_medication_product_form_codings",
+				  "medication_statement_medication_product_ingredients",
+				  "medication_statement_reason_not_givens"]
   end
 
   example 'resource name' do
@@ -72,7 +79,7 @@ describe NodeFunctions do
     .map{|n| n.column_name(medstatement)}
     .should =~ ["identifier__assigner__display",
 		"identifier__assigner__reference",
-		"identifier__assigner__type",
+		"identifier__assigner__type_name",
 		"identifier__key",
 		"identifier__label",
 		"identifier__period__end",

@@ -23,3 +23,13 @@ end
 
 Rules.apply(Fhir.graph)
 ExpandGraph.new(Fhir.graph).expand
+
+FHIR_SPEC_ROOT = File.dirname(__FILE__)
+
+ActiveRecord::Base.establish_connection(YAML.load_file( FHIR_SPEC_ROOT + '/database.yml'))
+
+unless ENV['NOGEN']
+  ActiveRecord::Schema.define do
+    eval File.read(File.dirname(__FILE__) + '/../migrations/schema.rb')
+  end
+end

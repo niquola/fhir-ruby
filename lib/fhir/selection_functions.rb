@@ -18,6 +18,12 @@ module Fhir
       end
     end
 
+    def branches(selection, *paths, &block)
+      paths.map do |path|
+	selection.branch(path)
+      end.sum
+    end
+
     def children(selection)
       selection.map(&:children).flatten
     end

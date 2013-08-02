@@ -28,4 +28,12 @@ describe Fhir::SelecionFunctions do
     selection.branch([1,2]).to_a.size.should == 2
     selection.branch([1]).to_a.size.should == 4
   end
+
+  it 'should select branches'  do
+    selection.branches([1,4], [1,2,3])
+    .to_a
+    .map(&:path)
+    .map(&:to_a)
+    .should == [[1,4],[1,2,3]]
+  end
 end

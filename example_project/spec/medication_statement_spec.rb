@@ -1,15 +1,6 @@
 require 'spec_helper'
-FHIR_SPEC_ROOT = File.dirname(__FILE__)
 
 describe 'Medication Statement' do
-  before :all do
-    ActiveRecord::Base.establish_connection(YAML.load_file( FHIR_SPEC_ROOT + '/database.yml'))
-
-    ActiveRecord::Schema.define do
-      eval File.read(File.dirname(__FILE__) + '/../migrations/schema.rb')
-    end
-  end
-
   example do
 
     codings_attributes = [
@@ -34,7 +25,7 @@ describe 'Medication Statement' do
     identifier_attributes = {
       key: '321312',
       assigner_attributes: {
-	type: 'hospital rx',
+	type_name: 'hospital rx',
 	display: 'Apteka'
       }
     }
