@@ -24,6 +24,10 @@ module Fhir
       attributes[:type] || ''
     end
 
+    def comment
+      attributes[:comment] || ''
+    end
+
     def inspect
       "<Node:#{@path.inspect}(#{attributes.inspect})>"
     end
@@ -34,9 +38,9 @@ module Fhir
 
     def method_missing(name, *args, &block)
       if mod.respond_to?(name)
-        mod.send(name, self, graph.selection, *args, &block)
+	mod.send(name, self, graph.selection, *args, &block)
       else
-        super
+	super
       end
     end
 
@@ -44,8 +48,8 @@ module Fhir
 
     def mod
       @mod ||= Module.new.tap do |mod|
-        mod.send(:extend, NodeFunctions)
-        @graph.node_modules.each {|m| mod.send(:extend, m) }
+	mod.send(:extend, NodeFunctions)
+	@graph.node_modules.each {|m| mod.send(:extend, m) }
       end
     end
   end

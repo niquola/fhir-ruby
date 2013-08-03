@@ -1,14 +1,18 @@
+# <%= node.comment.split("\n").join("\n# ") %>
 class Fhir::<%= node.class_name %>
   include Fhir::Composite
   include Fhir::Composing
 <% node.embedded_children.each do |emb| %>
+  # <%= emb.comment.split("\n").join("\n  # ") %>
   composing :<%= emb.name %>,
     class_name: 'Fhir::<%= emb.class_name %>'
 <% end -%>
 <%- node.columns.each do |column| -%>
+  # <%= column.comment.split("\n").join("\n  # ") %>
   composing_attribute :<%= column.column_name(node) %>
 <%- end -%>
 <%- node.embedded_associations.each do |column| -%>
+  # <%= column.comment.split("\n").join("\n  # ") %>
   composing_attribute :<%= column.column_name(node).pluralize %>_attributes
   composing_attribute :<%= column.column_name(node).pluralize %>
 <%- end -%>

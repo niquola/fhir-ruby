@@ -65,6 +65,11 @@ module Fhir
       @enum
     end
 
+
+    def annotation
+      @node.xpath('./annotation/documentation').map(&:text).join("\n")
+    end
+
     def attributes
       return nil if simple?
       @attributes ||= parse_attributes

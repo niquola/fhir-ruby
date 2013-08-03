@@ -1,3 +1,4 @@
+# <%= node.comment.split("\n").join("\n# ") %>
 class Fhir::<%= node.class_name %> < Fhir::Base
 <% node.references.each do |ref| %>
   belongs_to :<%= ref.class_name.underscore %>,
@@ -5,6 +6,7 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 <% end -%>
 
 <% node.associations.each do |ref| %>
+  # <%= ref.comment.split("\n").join("\n  # ") %>
   has_many :<%= ref.column_name(node).pluralize %>,
     class_name: '<%= ref.class_name %>'
 
@@ -12,11 +14,15 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 <% end -%>
 
 <% node.model_attributes.each do |column| -%>
+
   # @attribute: <%= column.column_name(node) %> <%= column.column_type %>
+  # <%= column.comment.split("\n").join("\n  # ") %>
 <% end -%>
 
   include Fhir::Composite
 <% node.embedded_children.each do |emb| -%>
+
+  # <%= emb.comment.split("\n").join("\n  # ") %>
   composing :<%= emb.name %>,
     class_name: 'Fhir::<%= emb.class_name %>'
 <% end -%>

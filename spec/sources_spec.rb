@@ -19,8 +19,6 @@ describe 'Graph sources' do
   end
 
   it 'should expand datatypes' do
-    node = selection.node(%w[MedicationStatement identifier])
-    # p Fhir.expand_datatypes(graph, node)
-    # node.descendants.debug
+    selection.node(%w[MedicationStatement identifier])
   end
 end

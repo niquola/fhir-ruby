@@ -24,9 +24,12 @@ generate do |graph|
 
   Rules.apply(graph)
   ExpandGraph.new(graph).expand
+  Rules.apply(graph)
 
 
-  branch = graph.selection.branches(['MedicationStatement'], ['AllergyIntolerance'], ['Condition'])
+  branch = graph
+  .selection
+  .branches(['MedicationStatement'], ['AllergyIntolerance'], ['Condition'])
   .reject { |node| %w[contained extension].include?(node.name) }
 
   File.open(File.join(migrations_folder, 'schema.rb'), 'w') do |f|

@@ -60,7 +60,7 @@ module Fhir
                        max: attr.max == 'unbounded' ? '*' : attr.max,
                        min: attr.min,
                        simple: attr.type.try(:simple?),
-                       comment: attr.type.try(:simple?),
+                       comment: attr.type.try(:annotation),
                        from: :datatypes,
                        datatype_attr: true)
       expand_datatypes(graph, node)

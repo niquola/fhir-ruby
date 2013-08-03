@@ -31,7 +31,9 @@ module SelectionFunctions
   end
 
   def tables(selection)
-    (selection.by_attr('type', 'Resource') + selection.by_attr('max', '*')).sorted
+    (selection.by_attr('type', 'Resource') + selection.by_attr('max', '*'))
+    .sorted
+    .select {|n| n.max != '0'}
   end
 
   def models(selection)

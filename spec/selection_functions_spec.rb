@@ -13,7 +13,7 @@ describe Fhir::SelecionFunctions do
   let(:selection) { graph.selection }
 
   it 'should debug' do
-    selection.debug
+    selection.should respond_to(:debug)
   end
 
   it 'should select' do
