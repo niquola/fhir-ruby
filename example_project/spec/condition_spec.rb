@@ -9,11 +9,14 @@ describe 'Condition' do
     date = Time.now
 
     evidence_attrs = {code_attributes: codeable_concept_attributes}
-    location_attrs = {details: 'details', code_attributes: codeable_concept_attributes}
+    location_attrs = {detail: 'detail', code_attributes: codeable_concept_attributes}
     related_item_attrs = {type_name: 'follows', code_attributes: codeable_concept_attributes}
 
     condition = Fhir::Condition.create!(
       date_asserted: date,
+      asserter_attributes: {
+        name_attributes: { text: 'Roman' }
+      },
       code_attributes: codeable_concept_attributes,
       category_attributes: codeable_concept_attributes,
       status: 'working',
@@ -45,7 +48,7 @@ describe 'Condition' do
 
     condition.evidences.first.code.text.should == 'code text'
     condition.locations.first.code.text.should == 'code text'
-    condition.locations.first.details.should == 'details'
+    condition.locations.first.detail.should == 'detail'
     p condition.related_items
     condition.related_items.first.code.text.should == 'code text'
     condition.related_items.first.type_name.should == 'follows'

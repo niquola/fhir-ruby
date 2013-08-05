@@ -9,8 +9,12 @@ class Rules
     graph.rule(%w[MedicationStatement medication package], max: '0')
     graph.rule(%w[MedicationStatement medication package], max: '0')
     graph.rule(%w[MedicationStatement medication product], max: '0')
-    graph.rule(%w[AllergyIntolerance recorder], type: 'Resource(Practitioner)', embed: true)
-    graph.rule(%w[Condition asserter], type: 'Resource(Practitioner)', embed: true)
     graph.rule(%w[MedicationStatement medication product ingredient item], type: 'Resource(Medication)')
+
+    graph.rule(%w[AllergyIntolerance recorder], type: 'Resource(Practitioner)', embed: true)
+    graph.rule(%w[AllergyIntolerance substance], embed: true)
+    graph.rule(%w[AllergyIntolerance reaction], embed: true)
+
+    graph.rule(%w[Condition asserter], type: 'Resource(Practitioner)', embed: true)
   end
 end

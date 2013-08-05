@@ -8,4 +8,10 @@ describe SelectionFunctions do
     .branch(['MedicationStatement'])
     .value_objects
   end
+
+  it 'should' do
+    selection
+    .branch(%w[Substance])
+    .debug
+  end
 end

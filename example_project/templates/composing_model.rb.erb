@@ -4,7 +4,7 @@ class Fhir::<%= node.class_name %>
   include Fhir::Composing
 <% node.embedded_children.each do |emb| %>
   # <%= emb.comment.split("\n").join("\n  # ") %>
-  composing :<%= emb.name %>,
+  composing :<%= emb.name.underscore %>,
     class_name: 'Fhir::<%= emb.class_name %>'
 <% end -%>
 <%- node.columns.each do |column| -%>
