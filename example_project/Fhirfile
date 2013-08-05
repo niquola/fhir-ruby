@@ -26,7 +26,6 @@ generate do |graph|
   ExpandGraph.new(graph).expand
   Rules.apply(graph)
 
-
   branch = graph
   .selection
   .branches(['MedicationStatement'], ['AllergyIntolerance'], ['Condition'])

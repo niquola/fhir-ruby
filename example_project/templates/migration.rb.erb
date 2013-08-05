@@ -6,6 +6,6 @@ create_table 'fhir.<%= node.table_name %>' do |t|
   t.belongs_to :<%= column.column_name(node) %>
 <% end -%>
 <%- node.columns.each do |column| -%>
-  t.<%= column.column_type %> :<%= column.column_name(node) %>
+  t.column :<%= column.column_name(node) %>, '<%= column.column_type %>'
 <% end -%>
 end

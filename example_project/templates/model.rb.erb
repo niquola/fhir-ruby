@@ -1,14 +1,21 @@
 # <%= node.comment.split("\n").join("\n# ") %>
 class Fhir::<%= node.class_name %> < Fhir::Base
 <% node.references.each do |ref| %>
-  belongs_to :<%= ref.class_name.underscore %>,
-    class_name: '<%= ref.class_name %>'
+<% if ref.type == 'Resource(Patient)' -%>
+  belongs_to :patient
+<% elsif ref.type == 'Resource(Encounter)' -%>
+  belongs_to :visit
+<% else -%>
+  # FIXME: think about outgoing references
+  # belongs_to :<%= ref.class_name.underscore %>,
+  # class_name: 'Fhir::<%= ref.referenced_resource.try(:class_name) || 'ERROR' %>'
+<% end -%>
 <% end -%>
 
 <% node.associations.each do |ref| %>
   # <%= ref.comment.split("\n").join("\n  # ") %>
   has_many :<%= ref.column_name(node).pluralize %>,
-    class_name: '<%= ref.class_name %>'
+    class_name: 'Fhir::<%= ref.class_name %>'
 
   accepts_nested_attributes_for :<%= ref.column_name(node).pluralize %>
 <% end -%>
@@ -23,7 +30,7 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 <% node.embedded_children.each do |emb| -%>
 
   # <%= emb.comment.split("\n").join("\n  # ") %>
-  composing :<%= emb.name %>,
+  composing :<%= emb.name.underscore %>,
     class_name: 'Fhir::<%= emb.class_name %>'
 <% end -%>
 end
