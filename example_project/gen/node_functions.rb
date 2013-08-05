@@ -41,19 +41,37 @@ module NodeFunctions
   def embedded_associations(node, selection)
     node
     .children
+    .by_attr('max', '*')
     .reject_contained
     .complex
-    .by_attr('max', '*')
   end
 
   def associations(node, selection)
     nodes = node
     .children
+    .by_attr('max', '*')
     .reject_contained
     .complex
-    .by_attr('max', '*')
 
-    nodes + node.children.map(&:associations).flatten
+    nodes + node
+    .children
+    .select{|n| n.max != '0'}
+    .map(&:associations)
+    .flatten
+  end
+
+  def embedded_objects(node, _)
+    node
+    .children
+    .by_attr('max', '1')
+    .reject_contained
+    .complex
+  end
+
+  def embedded_descendants(node, _)
+    node.embedded_objects +
+      (node.embedded_objects + node.embedded_associations)
+      .map(&:embedded_descendants).flatten
   end
 
   def resource_name(node, _)

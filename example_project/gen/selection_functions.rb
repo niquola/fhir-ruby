@@ -19,11 +19,9 @@ module SelectionFunctions
 
   def value_objects(selection)
     selection
-    .reject_contained
-    .complex
-    .select do |n|
-      n.type != 'Resource'
-    end.by_attr('max', '1')
+    .by_attr('type', 'Resource')
+    .map(&:embedded_descendants)
+    .flatten
   end
 
   def sorted(selection)
