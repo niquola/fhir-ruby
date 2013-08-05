@@ -7,6 +7,5 @@ describe SelectionFunctions do
     selection
     .branch(['MedicationStatement'])
     .value_objects
-    .debug
   end
 end
