@@ -3,6 +3,7 @@ require 'spec_helper'
 describe NodeFunctions do
   let(:selection) { Fhir.graph.selection }
 
+  let(:condition) { selection.node(['Condition']) }
   let(:medstatement) { selection.node(['MedicationStatement']) }
   let(:medication) { selection.node(['Medication']) }
   let(:dose) { selection.node(['MedicationStatement','dosage']) }
@@ -72,6 +73,14 @@ describe NodeFunctions do
     medstatement_patient.referenced_resource.should == patient
   end
 
+  example 'columns serializable attributes' do
+    condition
+    .all_serializable_attributes
+    .to_a
+    .map{|n| n.column_name(condition) }
+    .should include("asserter__name__given")
+  end
+
   example 'columns' do
     medstatement
     .columns
@@ -96,6 +105,7 @@ describe NodeFunctions do
 		"medication__name",
 		"medication__package__container__text",
 		"medication__product__form__text"]
+
   end
 
   example 'model attributes' do

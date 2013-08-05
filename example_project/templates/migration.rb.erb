@@ -8,4 +8,7 @@ create_table 'fhir.<%= node.table_name %>' do |t|
 <%- node.columns.each do |column| -%>
   t.column :<%= column.column_name(node) %>, '<%= column.column_type %>'
 <% end -%>
+<%- node.all_serializable_attributes.each do |column| -%>
+  t.column :<%= column.column_name(node) %>, 'text'
+<% end -%>
 end

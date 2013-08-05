@@ -12,6 +12,11 @@ class Fhir::<%= node.class_name %> < Fhir::Base
 <% end -%>
 <% end -%>
 
+<% node.all_serializable_attributes.each do |attribute| -%>
+  # <%= attribute.comment.split("\n").join("\n  # ") %>
+  serialize :<%= attribute.column_name(node) %>, Array
+<% end -%>
+
 <% node.associations.each do |ref| %>
   # <%= ref.comment.split("\n").join("\n  # ") %>
   has_many :<%= ref.column_name(node).pluralize %>,

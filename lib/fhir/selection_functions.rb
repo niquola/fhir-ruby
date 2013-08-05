@@ -30,7 +30,7 @@ module Fhir
 
     def simple(selection)
       selection.select do |node|
-        node.children.to_a.empty? && node.max == '1'
+        node.children.to_a.empty? && node.type !~ /^Resource/
       end
     end
 

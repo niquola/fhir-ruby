@@ -15,7 +15,9 @@ describe 'Condition' do
     condition = Fhir::Condition.create!(
       date_asserted: date,
       asserter_attributes: {
-        name_attributes: { text: 'Roman' }
+        name_attributes: { text: 'Roman',
+                           family: ['Abramovich', 'Yanukovich'],
+                           given: ['Albert', 'Eduard']}
       },
       code_attributes: codeable_concept_attributes,
       category_attributes: codeable_concept_attributes,

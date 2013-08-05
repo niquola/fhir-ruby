@@ -9,9 +9,12 @@ describe SelectionFunctions do
     .value_objects
   end
 
-  it 'should' do
+  it 'should select tables' do
     selection
-    .branch(%w[Substance])
-    .debug
+    .branch(['AllergyIntolerance'])
+    .tables
+    .to_a
+    .map(&:table_name)
+    .size.should == 21
   end
 end

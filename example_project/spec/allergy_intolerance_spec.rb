@@ -41,6 +41,6 @@ describe 'AllergyIntolerance' do
     allergy.sensitivity_type.should == 'allergy'
     allergy.recorded_date.should be_within(10.seconds).of(Time.now)
     allergy.status.should == 'status'
-    allergy.substance.first.type.codings.first.system_name.should == 'RxNorm'
+    allergy.substance.type.codings.first.system_name.should == 'RxNorm'
   end
 end

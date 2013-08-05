@@ -31,9 +31,8 @@ module SelectionFunctions
   end
 
   def tables(selection)
-    (selection.by_attr('type', 'Resource') + selection.by_attr('max', '*'))
-    .sorted
-    .select {|n| n.max != '0'}
+    resources = selection.by_attr('type', 'Resource')
+    resources + resources.map(&:associations).flatten
   end
 
   def models(selection)

@@ -69,6 +69,18 @@ module NodeFunctions
     singular.simple.simple_types.reject_idrefs + singular.map(&:columns).flatten
   end
 
+  def serializable_attributes(node, _)
+    node.children.simple.by_attr('max', '*')
+  end
+
+  def all_serializable_attributes(node, _)
+    node.serializable_attributes +
+      node.children
+      .by_attr('max', '1')
+      .map(&:all_serializable_attributes)
+      .flatten
+  end
+
   def model_attributes(node, selection)
     node.children.by_attr('max', '1').simple.simple_types.reject_idrefs
   end
@@ -105,4 +117,5 @@ module NodeFunctions
       'uuid' => 'string'
     }[node.type] || node.type
   end
+
 end
